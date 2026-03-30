@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWhitePen favicon preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(180deg, #f8f5ef 0%, #f1ebe2 100%);
+      color: #1f1f1a;
+    }
+
+    h1,
+    p {
+      margin-top: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .card {
+      padding: 1rem;
+      border: 1px solid rgba(31, 31, 26, 0.12);
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.75);
+      box-shadow: 0 12px 30px rgba(31, 31, 26, 0.08);
+    }
+
+    .swatch {
+      display: grid;
+      place-items: center;
+      min-height: 112px;
+      border-radius: 0.75rem;
+      background:
+        linear-gradient(45deg, rgba(31, 31, 26, 0.06) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(31, 31, 26, 0.06) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(31, 31, 26, 0.06) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(31, 31, 26, 0.06) 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+
+    .swatch--dark {
+      background: #171717;
+    }
+
+    .label {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>AWhitePen favicon preview</h1>
+  <p>Master SVG and generated outputs shown against transparent-friendly backgrounds.</p>
+
+  <div class="grid">
+    <section class="card">
+      <div class="swatch">
+        <img src="favicon.svg" alt="Master SVG favicon" width="96" height="96">
+      </div>
+      <p class="label">favicon.svg</p>
+    </section>
+
+    <section class="card">
+      <div class="swatch">
+        <img src="favicon-16x16.png" alt="16 by 16 favicon preview" width="32" height="32">
+      </div>
+      <p class="label">favicon-16x16.png</p>
+    </section>
+
+    <section class="card">
+      <div class="swatch">
+        <img src="favicon-32x32.png" alt="32 by 32 favicon preview" width="48" height="48">
+      </div>
+      <p class="label">favicon-32x32.png</p>
+    </section>
+
+    <section class="card">
+      <div class="swatch">
+        <img src="favicon-48x48.png" alt="48 by 48 favicon preview" width="64" height="64">
+      </div>
+      <p class="label">favicon-48x48.png</p>
+    </section>
+
+    <section class="card">
+      <div class="swatch">
+        <img src="apple-touch-icon.png" alt="Apple touch icon preview" width="72" height="72">
+      </div>
+      <p class="label">apple-touch-icon.png</p>
+    </section>
+
+    <section class="card">
+      <div class="swatch swatch--dark">
+        <img src="favicon.svg" alt="Master SVG favicon on dark background" width="96" height="96">
+      </div>
+      <p class="label">SVG on dark background</p>
+    </section>
+  </div>
+</body>
+</html>

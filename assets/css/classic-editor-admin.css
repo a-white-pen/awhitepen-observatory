@@ -1,0 +1,10 @@
+/* Keep Classic Editor publish actions left-aligned and calm. */
+#minor-publishing-actions {
+	text-align: left;
+}
+
+#minor-publishing-actions #post-preview,
+#minor-publishing-actions .preview.button {
+	float: none;
+	margin: 0;
+}

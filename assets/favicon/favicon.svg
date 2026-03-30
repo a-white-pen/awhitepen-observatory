@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <g transform="rotate(34 32 32)" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="25" y="6" width="14" height="14" rx="3.5" stroke-width="5.2" />
+    <path d="M24 21.5H40" stroke-width="4.2" />
+    <path
+      d="M32 21.8C39.2 21.8 44.5 27 45.1 34L35.6 57.3C35.1 58.8 33.7 59.8 32 59.8C30.3 59.8 28.9 58.8 28.4 57.3L18.9 34C19.5 27 24.8 21.8 32 21.8Z"
+      stroke-width="5.2"
+    />
+    <path d="M32 56.8V33.2" stroke-width="3.6" />
+    <circle cx="32" cy="30.8" r="3.1" stroke-width="3.1" />
+    <path d="M32 60.2C30.3 62.6 27.9 64.3 25 64.9C22.7 65.4 20.5 65.1 18.4 64" stroke-width="2.8" />
+  </g>
+</svg>
