@@ -40,7 +40,7 @@ $footer_social_rows = awhitepen_footer_social_rows();
 							<ul class="footer-link-row">
 								<?php foreach ( $row as $link ) : ?>
 									<li>
-										<a class="footer-social-link" href="<?php echo esc_url( $link['url'] ); ?>" aria-label="<?php echo esc_attr( $link['label'] ); ?>">
+										<a class="footer-social-link" href="<?php echo esc_url( $link['url'] ); ?>" aria-label="<?php echo esc_attr( $link['label'] ); ?>" target="_blank" rel="noopener noreferrer">
 											<?php echo awhitepen_footer_social_icon_svg( $link['label'] ); ?>
 										</a>
 									</li>
@@ -48,7 +48,7 @@ $footer_social_rows = awhitepen_footer_social_rows();
 							</ul>
 						<?php endforeach; ?>
 						<p class="footer-rss-row">
-							<a class="footer-rss-link" href="https://awhitepen.com/feed/" aria-label="<?php esc_attr_e( 'Subscribe via RSS', 'awhitepen' ); ?>">
+							<a class="footer-rss-link" href="https://awhitepen.com/feed/" aria-label="<?php esc_attr_e( 'Subscribe via RSS', 'awhitepen' ); ?>" target="_blank" rel="noopener noreferrer">
 								<?php echo awhitepen_footer_social_icon_svg( 'RSS' ); ?>
 								<span class="footer-rss-label"><?php esc_html_e( 'Subscribe via RSS', 'awhitepen' ); ?></span>
 							</a>
