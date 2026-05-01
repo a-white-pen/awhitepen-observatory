@@ -970,15 +970,18 @@ input[type="submit"] {
 }
 
 .story-card--featured .story-card__excerpt > * {
+  line-clamp: 8;
   -webkit-line-clamp: 8;
 }
 
 .story-card--medium .story-card__excerpt > * {
+  line-clamp: 5;
   -webkit-line-clamp: 5;
 }
 
 .story-card--compact .story-card__excerpt > * {
-  -webkit-line-clamp: 2;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
 }
 
 .story-card__meta,

@@ -2373,7 +2373,7 @@ function awhitepen_excerpt_length( $length ) {
 }
 add_filter( 'excerpt_length', 'awhitepen_excerpt_length' );
 
-function awhitepen_get_stream_excerpt( $post = null, $word_limit = 40 ) {
+function awhitepen_get_clean_excerpt( $post = null, $word_limit = 42 ) {
 	$post = get_post( $post );
 
 	if ( ! $post instanceof WP_Post ) {
@@ -2383,20 +2383,51 @@ function awhitepen_get_stream_excerpt( $post = null, $word_limit = 40 ) {
 	$word_limit = max( 1, (int) $word_limit );
 	$excerpt    = has_excerpt( $post ) ? $post->post_excerpt : $post->post_content;
 
-	$excerpt = strip_shortcodes( $excerpt );
+	if ( ! has_excerpt( $post ) ) {
+		$excerpt = strip_shortcodes( $excerpt );
 
-	if ( function_exists( 'excerpt_remove_blocks' ) ) {
-		$excerpt = excerpt_remove_blocks( $excerpt );
+		if ( function_exists( 'excerpt_remove_blocks' ) ) {
+			$excerpt = excerpt_remove_blocks( $excerpt );
+		}
+
+		$excerpt = preg_replace( '#<(iframe|script|style|object|embed|video|audio)[^>]*>.*?</\1>#is', ' ', $excerpt );
+		$excerpt = preg_replace( '#<img[^>]*>#is', ' ', $excerpt );
+		$excerpt = preg_replace( '#<figure[^>]*class=(["\'])[^"\']*wp-block-(?:embed|image)[^"\']*\1[^>]*>.*?</figure>#is', ' ', $excerpt );
+		$excerpt = preg_replace( '#<!--\s*/?wp:[^>]*-->#is', ' ', $excerpt );
+		$excerpt = preg_replace( '/^\s*https?:\/\/\S+\s*$/mi', ' ', $excerpt );
 	}
 
-	$excerpt = wp_strip_all_tags( $excerpt, true );
+	$excerpt = html_entity_decode( wp_strip_all_tags( $excerpt, true ), ENT_QUOTES | ENT_HTML5, get_bloginfo( 'charset' ) );
+	$excerpt = preg_replace( '/\bSources?:\s*/i', ' ', $excerpt );
+	$excerpt = preg_replace( '#https?://[^\s<>()]+#i', ' ', $excerpt );
 	$excerpt = trim( preg_replace( '/\s+/', ' ', $excerpt ) );
 
 	if ( '' === $excerpt ) {
 		return '';
 	}
 
-	return wp_trim_words( $excerpt, $word_limit, '…' );
+	// Prefer the first real body copy when posts open with editorial notes before a synopsis label.
+	foreach ( array( 'Synopsis:', 'Summary:' ) as $marker ) {
+		$marker_position = stripos( $excerpt, $marker );
+
+		if ( false === $marker_position || 280 < $marker_position ) {
+			continue;
+		}
+
+		$excerpt_after_marker = trim( substr( $excerpt, $marker_position + strlen( $marker ) ) );
+
+		if ( '' !== $excerpt_after_marker ) {
+			$excerpt = $excerpt_after_marker;
+		}
+
+		break;
+	}
+
+	return wp_trim_words( $excerpt, $word_limit, '...' );
+}
+
+function awhitepen_get_stream_excerpt( $post = null, $word_limit = 40 ) {
+	return awhitepen_get_clean_excerpt( $post, $word_limit );
 }
 
 function awhitepen_get_stream_story_classes( $story_index ) {
@@ -2415,14 +2446,14 @@ function awhitepen_get_stream_story_classes( $story_index ) {
 
 function awhitepen_get_stream_excerpt_words( $story_index ) {
 	if ( 0 === (int) $story_index ) {
-		return 88;
+		return 110;
 	}
 
 	if ( (int) $story_index < 3 ) {
-		return 50;
+		return 70;
 	}
 
-	return 22;
+	return 42;
 }
 
 function awhitepen_render_notebook_stream( $query = null ) {
@@ -2443,6 +2474,7 @@ function awhitepen_render_notebook_stream( $query = null ) {
 		while ( $query->have_posts() ) :
 			$query->the_post();
 			$category_meta_html = awhitepen_get_post_category_meta_html( get_post() );
+			$excerpt            = awhitepen_get_stream_excerpt( get_post(), awhitepen_get_stream_excerpt_words( $story_index ) );
 			?>
 			<article id="post-<?php the_ID(); ?>" <?php post_class( awhitepen_get_stream_story_classes( $story_index ) ); ?>>
 				<p class="story-card__meta">
@@ -2452,9 +2484,11 @@ function awhitepen_render_notebook_stream( $query = null ) {
 					<?php endif; ?>
 				</p>
 				<h2 class="story-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
-				<div class="story-card__excerpt">
-					<p><?php echo esc_html( awhitepen_get_stream_excerpt( get_post(), awhitepen_get_stream_excerpt_words( $story_index ) ) ); ?></p>
-				</div>
+				<?php if ( $excerpt ) : ?>
+					<div class="story-card__excerpt">
+						<p><?php echo esc_html( $excerpt ); ?></p>
+					</div>
+				<?php endif; ?>
 				<p class="story-card__cta"><a class="text-link" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Continue reading', 'awhitepen' ); ?></a></p>
 			</article>
 			<?php
