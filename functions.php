@@ -166,7 +166,7 @@ function awhitepen_classic_editor_settings( $init, $editor_id ) {
 		'35566B', 'Link blue',
 		'4F6B57', 'Green',
 		'8A4B4B', 'Red',
-		'F4E7C8', 'Warm highlight',
+		'F6F4EF', 'Warm highlight',
 		'E3EBE2', 'Soft sage highlight',
 		'F0E1E1', 'Soft rose highlight',
 	);
