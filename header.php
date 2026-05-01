@@ -44,7 +44,7 @@
 								'menu_id'        => 'primary-menu',
 								'menu_class'     => 'menu primary-menu',
 								'container'      => false,
-								'depth'          => 0,
+								'depth'          => 1,
 								'fallback_cb'    => 'awhitepen_primary_navigation_fallback',
 							)
 						);

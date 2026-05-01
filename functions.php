@@ -319,13 +319,11 @@ function awhitepen_enqueue_assets() {
 		'awhitepen-main',
 		'awhitepenTheme',
 		array(
-			'expandLabel'      => __( 'Open menu', 'awhitepen' ),
-			'collapseLabel'    => __( 'Close menu', 'awhitepen' ),
-			'openSubmenuLabel' => __( 'Open submenu', 'awhitepen' ),
-			'closeSubmenuLabel' => __( 'Close submenu', 'awhitepen' ),
-			'darkModeLabel'    => __( 'Enable dark mode', 'awhitepen' ),
-			'lightModeLabel'   => __( 'Enable light mode', 'awhitepen' ),
-			'themeStorageKey'  => 'awhitepen-theme',
+			'expandLabel'     => __( 'Open menu', 'awhitepen' ),
+			'collapseLabel'   => __( 'Close menu', 'awhitepen' ),
+			'darkModeLabel'   => __( 'Enable dark mode', 'awhitepen' ),
+			'lightModeLabel'  => __( 'Enable light mode', 'awhitepen' ),
+			'themeStorageKey' => 'awhitepen-theme',
 		)
 	);
 }
@@ -902,6 +900,10 @@ function awhitepen_inject_dynamic_blog_categories_into_menu( $items, $args ) {
 		return $items;
 	}
 
+	if ( isset( $args->depth ) && 1 === (int) $args->depth ) {
+		return $items;
+	}
+
 	$blog_item = null;
 
 	foreach ( $items as $item ) {
@@ -999,6 +1001,10 @@ function awhitepen_inject_about_submenu_into_menu( $items, $args ) {
 		return $items;
 	}
 
+	if ( isset( $args->depth ) && 1 === (int) $args->depth ) {
+		return $items;
+	}
+
 	$about_item = null;
 
 	foreach ( $items as $item ) {
@@ -1082,30 +1088,14 @@ function awhitepen_primary_navigation_fallback( $args = array() ) {
 	$menu_id         = ! empty( $args['menu_id'] ) ? $args['menu_id'] : 'primary-menu';
 	$menu_class      = ! empty( $args['menu_class'] ) ? $args['menu_class'] : 'menu';
 	$is_blog         = is_home() || is_archive() || is_single() || is_search() || awhitepen_is_virtual_blog_request();
-	$current_term    = awhitepen_get_current_blog_category_context();
-	$current_term_id = $current_term instanceof WP_Term ? (int) $current_term->term_id : 0;
-	$top_level_terms = awhitepen_get_blog_category_terms( 0 );
-	$current_path    = awhitepen_current_request_path();
 	$pages           = array(
 		array(
 			'slug'  => 'portfolio',
 			'label' => __( 'Portfolio', 'awhitepen' ),
 		),
 		array(
-			'slug'     => 'about',
-			'label'    => __( 'About', 'awhitepen' ),
-			'children' => array(
-				array(
-					'label' => __( '"specs"', 'awhitepen' ),
-					'url'   => home_url( '/about-specs/' ),
-					'slug'  => 'about-specs',
-				),
-				array(
-					'label' => __( 'Goals', 'awhitepen' ),
-					'url'   => home_url( '/about-goals/' ),
-					'slug'  => 'about-goals',
-				),
-			),
+			'slug'  => 'about',
+			'label' => __( 'About', 'awhitepen' ),
 		),
 		array(
 			'slug'  => 'contact',
@@ -1114,45 +1104,14 @@ function awhitepen_primary_navigation_fallback( $args = array() ) {
 	);
 	?>
 	<ul id="<?php echo esc_attr( $menu_id ); ?>" class="<?php echo esc_attr( $menu_class ); ?>">
-		<li class="menu-item<?php echo ! empty( $top_level_terms ) ? ' menu-item-has-children' : ''; ?><?php echo $is_blog ? ' current-menu-item current-menu-ancestor' : ''; ?>">
+		<li class="menu-item<?php echo $is_blog ? ' current-menu-item current-menu-ancestor' : ''; ?>">
 			<a href="<?php echo esc_url( awhitepen_posts_page_url() ); ?>"><?php esc_html_e( 'Blog', 'awhitepen' ); ?></a>
-			<?php if ( ! empty( $top_level_terms ) ) : ?>
-				<?php awhitepen_render_blog_menu_terms( 0, $current_term_id ); ?>
-			<?php endif; ?>
 		</li>
 		<?php foreach ( $pages as $page ) : ?>
-			<?php
-			$children = isset( $page['children'] ) && is_array( $page['children'] ) ? $page['children'] : array();
-			$is_child_current = false;
-
-			if ( ! empty( $children ) ) {
-				foreach ( $children as $child ) {
-					$child_path = awhitepen_normalize_path_for_compare( isset( $child['url'] ) ? wp_parse_url( $child['url'], PHP_URL_PATH ) : '' );
-
-					if ( '' !== $current_path && '' !== $child_path && $current_path === $child_path ) {
-						$is_child_current = true;
-						break;
-					}
-				}
-			}
-			?>
-			<li class="menu-item<?php echo is_page( $page['slug'] ) ? ' current-menu-item' : ''; ?><?php echo $is_child_current ? ' current-menu-ancestor current-menu-parent' : ''; ?><?php echo ! empty( $children ) ? ' menu-item-has-children' : ''; ?>">
+			<li class="menu-item<?php echo is_page( $page['slug'] ) ? ' current-menu-item' : ''; ?>">
 				<a href="<?php echo esc_url( home_url( '/' . $page['slug'] . '/' ) ); ?>">
 					<?php echo esc_html( $page['label'] ); ?>
 				</a>
-				<?php if ( ! empty( $children ) ) : ?>
-					<ul class="sub-menu">
-						<?php foreach ( $children as $child ) : ?>
-							<?php
-							$child_path = awhitepen_normalize_path_for_compare( isset( $child['url'] ) ? wp_parse_url( $child['url'], PHP_URL_PATH ) : '' );
-							$is_current = '' !== $current_path && '' !== $child_path && $current_path === $child_path;
-							?>
-							<li class="menu-item menu-item-type-custom menu-item-object-custom<?php echo $is_current ? ' current-menu-item' : ''; ?>">
-								<a href="<?php echo esc_url( $child['url'] ); ?>"><?php echo esc_html( $child['label'] ); ?></a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				<?php endif; ?>
 			</li>
 		<?php endforeach; ?>
 	</ul>
