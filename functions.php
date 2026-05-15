@@ -778,36 +778,55 @@ function awhitepen_current_request_path() {
 	return awhitepen_normalize_path_for_compare( is_string( $path ) ? $path : '' );
 }
 
-function awhitepen_is_about_menu_item( $item ) {
+function awhitepen_is_page_slug_menu_item( $item, $slug, $fallback_title = '' ) {
 	if ( ! is_object( $item ) ) {
 		return false;
 	}
 
-	static $about_page_id = null;
+	$slug = is_string( $slug ) ? trim( $slug, '/' ) : '';
 
-	if ( null === $about_page_id ) {
-		$about_page    = get_page_by_path( 'about' );
-		$about_page_id = $about_page instanceof WP_Post ? (int) $about_page->ID : 0;
+	if ( '' === $slug ) {
+		return false;
 	}
 
-	$about_url_path = awhitepen_normalize_path_for_compare( wp_parse_url( home_url( '/about/' ), PHP_URL_PATH ) );
-	$item_url_path  = awhitepen_normalize_path_for_compare( isset( $item->url ) ? wp_parse_url( $item->url, PHP_URL_PATH ) : '' );
+	static $page_ids = array();
 
-	if ( $about_page_id > 0 && isset( $item->object_id ) && (int) $item->object_id === $about_page_id ) {
+	if ( ! isset( $page_ids[ $slug ] ) ) {
+		$page                = get_page_by_path( $slug );
+		$page_ids[ $slug ] = $page instanceof WP_Post ? (int) $page->ID : 0;
+	}
+
+	$page_url_path = awhitepen_normalize_path_for_compare( wp_parse_url( home_url( '/' . $slug . '/' ), PHP_URL_PATH ) );
+	$item_url_path = awhitepen_normalize_path_for_compare( isset( $item->url ) ? wp_parse_url( $item->url, PHP_URL_PATH ) : '' );
+
+	if ( $page_ids[ $slug ] > 0 && isset( $item->object_id ) && (int) $item->object_id === $page_ids[ $slug ] ) {
 		return true;
 	}
 
-	if ( '' !== $about_url_path && '' !== $item_url_path ) {
-		return $about_url_path === $item_url_path;
+	if ( '' !== $page_url_path && '' !== $item_url_path ) {
+		return $page_url_path === $item_url_path;
 	}
 
 	$item_title = isset( $item->title ) ? trim( wp_strip_all_tags( (string) $item->title ) ) : '';
+	$title      = '' !== $fallback_title ? $fallback_title : $slug;
 
-	if ( '' !== $item_title && 0 === strcasecmp( $item_title, 'about' ) ) {
+	if ( '' !== $item_title && 0 === strcasecmp( $item_title, $title ) ) {
 		return true;
 	}
 
 	return false;
+}
+
+function awhitepen_is_about_menu_item( $item ) {
+	return awhitepen_is_page_slug_menu_item( $item, 'about', 'About' );
+}
+
+function awhitepen_is_portfolio_menu_item( $item ) {
+	return awhitepen_is_page_slug_menu_item( $item, 'portfolio', 'Portfolio' );
+}
+
+function awhitepen_is_status_menu_item( $item ) {
+	return awhitepen_is_page_slug_menu_item( $item, 'status', 'Status' );
 }
 
 function awhitepen_menu_item_descends_from( $item, $ancestor_id, $items_by_id ) {
@@ -1084,6 +1103,73 @@ function awhitepen_inject_about_submenu_into_menu( $items, $args ) {
 }
 add_filter( 'wp_nav_menu_objects', 'awhitepen_inject_about_submenu_into_menu', 11, 2 );
 
+function awhitepen_inject_status_into_menu( $items, $args ) {
+	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
+		return $items;
+	}
+
+	$portfolio_item = null;
+	$about_item     = null;
+
+	foreach ( $items as $item ) {
+		if ( isset( $item->menu_item_parent ) && 0 !== (int) $item->menu_item_parent ) {
+			continue;
+		}
+
+		if ( awhitepen_is_status_menu_item( $item ) ) {
+			return $items;
+		}
+
+		if ( ! $portfolio_item && awhitepen_is_portfolio_menu_item( $item ) ) {
+			$portfolio_item = $item;
+		}
+
+		if ( ! $about_item && awhitepen_is_about_menu_item( $item ) ) {
+			$about_item = $item;
+		}
+	}
+
+	if ( ! $portfolio_item && ! $about_item ) {
+		return $items;
+	}
+
+	$item_ids = array();
+
+	foreach ( $items as $item ) {
+		if ( isset( $item->ID ) ) {
+			$item_ids[] = (int) $item->ID;
+		}
+	}
+
+	$next_id      = ! empty( $item_ids ) ? max( $item_ids ) + 1000 : 1000;
+	$current_path = awhitepen_current_request_path();
+	$status_url   = home_url( '/status/' );
+	$status_path  = awhitepen_normalize_path_for_compare( wp_parse_url( $status_url, PHP_URL_PATH ) );
+	$status_item  = awhitepen_build_static_submenu_item(
+		0,
+		$next_id,
+		__( 'Status', 'awhitepen' ),
+		$status_url,
+		'' !== $current_path && $current_path === $status_path
+	);
+	$new_items    = array();
+
+	foreach ( $items as $item ) {
+		if ( $about_item && (int) $item->ID === (int) $about_item->ID ) {
+			$new_items[] = $status_item;
+		}
+
+		$new_items[] = $item;
+
+		if ( ! $about_item && $portfolio_item && (int) $item->ID === (int) $portfolio_item->ID ) {
+			$new_items[] = $status_item;
+		}
+	}
+
+	return $new_items;
+}
+add_filter( 'wp_nav_menu_objects', 'awhitepen_inject_status_into_menu', 12, 2 );
+
 function awhitepen_primary_navigation_fallback( $args = array() ) {
 	$menu_id         = ! empty( $args['menu_id'] ) ? $args['menu_id'] : 'primary-menu';
 	$menu_class      = ! empty( $args['menu_class'] ) ? $args['menu_class'] : 'menu';
@@ -1092,6 +1178,10 @@ function awhitepen_primary_navigation_fallback( $args = array() ) {
 		array(
 			'slug'  => 'portfolio',
 			'label' => __( 'Portfolio', 'awhitepen' ),
+		),
+		array(
+			'slug'  => 'status',
+			'label' => __( 'Status', 'awhitepen' ),
 		),
 		array(
 			'slug'  => 'about',

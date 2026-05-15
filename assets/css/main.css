@@ -1251,6 +1251,31 @@ input[type="submit"] {
   font-size: var(--font-size-sm);
 }
 
+.site-main--status {
+  padding-bottom: 0;
+}
+
+.page-entry--status {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.status-widget-shell {
+  width: 100%;
+  overflow: visible;
+  border: var(--border-light-soft);
+  border-radius: var(--radius-sm);
+  background: #faf9f5;
+}
+
+.status-widget-frame {
+  display: block;
+  width: 100%;
+  min-height: calc(100vh - var(--header-height));
+  border: 0;
+  background: #faf9f5;
+}
+
 .entry-content .awhitepen-content-card__title {
   margin: 0 0 var(--space-2);
 }
