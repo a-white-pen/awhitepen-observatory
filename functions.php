@@ -2204,10 +2204,20 @@ function awhitepen_render_footer_strava_module() {
 	<?php
 }
 
+function awhitepen_get_stored_instagram_access_token() {
+	$stored_access_token = get_option( 'awhitepen_instagram_access_token', '' );
+
+	if ( is_string( $stored_access_token ) && '' !== trim( $stored_access_token ) ) {
+		return trim( $stored_access_token );
+	}
+
+	return defined( 'INSTAGRAM_ACCESS_TOKEN' ) ? trim( (string) INSTAGRAM_ACCESS_TOKEN ) : '';
+}
+
 function awhitepen_get_instagram_footer_config() {
 	$config = array(
 		'user_id'      => defined( 'INSTAGRAM_USER_ID' ) ? trim( (string) INSTAGRAM_USER_ID ) : '',
-		'access_token' => defined( 'INSTAGRAM_ACCESS_TOKEN' ) ? trim( (string) INSTAGRAM_ACCESS_TOKEN ) : '',
+		'access_token' => awhitepen_get_stored_instagram_access_token(),
 	);
 
 	$config['is_configured'] = '' !== $config['access_token'] && '' !== $config['user_id'];

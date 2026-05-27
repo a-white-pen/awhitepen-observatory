@@ -155,4 +155,79 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.addEventListener("load", syncHeaderOffset);
   window.addEventListener("resize", syncHeaderOffset);
+
+  var statusDashboard = document.querySelector("[data-status-dashboard]");
+
+  if (statusDashboard) {
+    var statusTabs = Array.prototype.slice.call(
+      statusDashboard.querySelectorAll("[data-status-tab]")
+    );
+    var statusPanels = Array.prototype.slice.call(
+      statusDashboard.querySelectorAll("[data-status-panel]")
+    );
+    var defaultStatusTab = statusDashboard.getAttribute("data-default-tab") || "fuel";
+
+    function getStatusSlugFromHash() {
+      return window.location.hash.replace(/^#/, "").toLowerCase();
+    }
+
+    function hasStatusTab(slug) {
+      return statusTabs.some(function (tab) {
+        return tab.getAttribute("data-status-tab") === slug;
+      });
+    }
+
+    function resizeStatusFrames() {
+      window.dispatchEvent(new Event("resize"));
+    }
+
+    function selectStatusTab(slug, shouldUpdateHash) {
+      var selectedSlug = hasStatusTab(slug) ? slug : defaultStatusTab;
+      var selectedPanel = null;
+
+      statusTabs.forEach(function (tab) {
+        var isSelected = tab.getAttribute("data-status-tab") === selectedSlug;
+
+        tab.classList.toggle("is-active", isSelected);
+        tab.setAttribute("aria-selected", String(isSelected));
+      });
+
+      statusPanels.forEach(function (panel) {
+        var isSelected = panel.getAttribute("data-status-panel") === selectedSlug;
+
+        panel.classList.toggle("is-active", isSelected);
+        panel.hidden = !isSelected;
+
+        if (isSelected) {
+          selectedPanel = panel;
+        }
+      });
+
+      if (shouldUpdateHash && window.location.hash !== "#" + selectedSlug) {
+        window.history.pushState(null, "", "#" + selectedSlug);
+      }
+
+      if (selectedPanel && selectedPanel.querySelector("[data-status-widget-frame]")) {
+        setTimeout(resizeStatusFrames, 60);
+        setTimeout(resizeStatusFrames, 240);
+      }
+    }
+
+    statusTabs.forEach(function (tab) {
+      tab.addEventListener("click", function (event) {
+        event.preventDefault();
+        selectStatusTab(tab.getAttribute("data-status-tab"), true);
+      });
+    });
+
+    window.addEventListener("hashchange", function () {
+      selectStatusTab(getStatusSlugFromHash(), false);
+    });
+
+    window.addEventListener("popstate", function () {
+      selectStatusTab(getStatusSlugFromHash(), false);
+    });
+
+    selectStatusTab(getStatusSlugFromHash(), false);
+  }
 });
