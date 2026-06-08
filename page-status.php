@@ -17,13 +17,13 @@ $status_dashboards = array(
 	array(
 		'slug'        => 'mind',
 		'label'       => __( 'MIND', 'awhitepen' ),
-		'description' => array( __( 'focus', 'awhitepen' ), __( 'attention', 'awhitepen' ) ),
+		'description' => array( __( 'focus', 'awhitepen' ), __( 'attention', 'awhitepen' ), __( 'sleep', 'awhitepen' ) ),
 		'accent'      => '#5B57C8',
 	),
 	array(
 		'slug'        => 'body',
 		'label'       => __( 'BODY', 'awhitepen' ),
-		'description' => array( __( 'sleep', 'awhitepen' ), __( 'weight', 'awhitepen' ), __( 'move', 'awhitepen' ) ),
+		'description' => array( __( 'weight', 'awhitepen' ), __( 'move', 'awhitepen' ), __( 'teeth', 'awhitepen' ) ),
 		'accent'      => '#B14C66',
 	),
 	array(
@@ -40,7 +40,16 @@ $status_dashboards = array(
 	),
 );
 
-$default_status_dashboard = 'fuel';
+$default_status_dashboard = 'today';
+
+// Status tabs whose panel mounts an inline widget (assets/status/widgets/<slug>.js,
+// registered as window.AWP_WIDGETS[<slug>]). Others render the "coming soon" placeholder.
+$status_widgets = array(
+	'today'     => true,
+	'fuel'      => true,
+	'body'      => true,
+	'resources' => true,
+);
 ?>
 
 <main id="primary" class="site-main site-main--status">
@@ -96,21 +105,12 @@ $default_status_dashboard = 'fuel';
 							data-status-panel="<?php echo esc_attr( $dashboard['slug'] ); ?>"
 							<?php echo $is_active ? '' : 'hidden'; ?>
 						>
-							<?php if ( 'fuel' === $dashboard['slug'] ) : ?>
-								<div class="status-widget-shell">
-									<iframe
-										class="status-widget-frame"
-										data-status-widget-frame
-										src="<?php echo esc_url( AWHITEPEN_URI . '/assets/status/macros-widget-standalone.html' ); ?>"
-										title="<?php esc_attr_e( 'Fuel dashboard', 'awhitepen' ); ?>"
-										loading="eager"
-										scrolling="no"
-									></iframe>
-								</div>
+							<?php if ( isset( $status_widgets[ $dashboard['slug'] ] ) ) : ?>
+								<div class="status-widget-mount" data-status-widget="<?php echo esc_attr( $dashboard['slug'] ); ?>"></div>
 							<?php else : ?>
 								<div class="status-dashboard-placeholder" style="--status-tab-accent: <?php echo esc_attr( $dashboard['accent'] ); ?>;">
 									<p class="status-dashboard-placeholder__eyebrow"><?php echo esc_html( $dashboard['label'] ); ?></p>
-									<h2 class="status-dashboard-placeholder__title"><?php esc_html_e( 'Coming soon', 'awhitepen' ); ?></h2>
+									<h2 class="status-dashboard-placeholder__title"><?php esc_html_e( 'Coming Soon', 'awhitepen' ); ?></h2>
 									<p class="status-dashboard-placeholder__text">
 										<?php
 										printf(
@@ -125,80 +125,49 @@ $default_status_dashboard = 'fuel';
 						</section>
 					<?php endforeach; ?>
 				</div>
-				<script>
-					(function () {
-						var frame = document.querySelector('[data-status-widget-frame]');
-
-						if (!frame) {
-							return;
-						}
-
-						function resizeFrame() {
-							var doc;
-							var body;
-							var html;
-							var height;
-
-							try {
-								doc = frame.contentDocument || frame.contentWindow.document;
-							} catch (error) {
-								return;
+					<?php
+					// Inline widget assets: shared React + per-widget mount JS + widget CSS + widget fonts.
+					$status_widget_dir     = '/assets/status/widgets/';
+					$status_widget_scripts = array( 'react.js', 'react-dom.js', 'body.js', 'fuel.js', 'resources.js', 'today.js' );
+					$status_widget_styles  = array( 'resources.css', 'widgets-v2.css' );
+					?>
+					<link rel="preconnect" href="https://fonts.googleapis.com">
+					<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+					<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+					<?php foreach ( $status_widget_styles as $status_widget_style ) : ?>
+					<link rel="stylesheet" href="<?php echo esc_url( add_query_arg( 'ver', awhitepen_asset_version( $status_widget_dir . $status_widget_style ), AWHITEPEN_URI . $status_widget_dir . $status_widget_style ) ); ?>">
+					<?php endforeach; ?>
+					<?php foreach ( $status_widget_scripts as $status_widget_script ) : ?>
+					<script src="<?php echo esc_url( add_query_arg( 'ver', awhitepen_asset_version( $status_widget_dir . $status_widget_script ), AWHITEPEN_URI . $status_widget_dir . $status_widget_script ) ); ?>"></script>
+					<?php endforeach; ?>
+					<script>
+						(function () {
+							var mounted = {};
+							function mount(slug) {
+								if (!slug || mounted[slug]) { return; }
+								var el = document.querySelector('.status-widget-mount[data-status-widget="' + slug + '"]');
+								var fn = window.AWP_WIDGETS && window.AWP_WIDGETS[slug];
+								if (el && fn) {
+									try { fn(el); mounted[slug] = true; } catch (e) { if (window.console) { console.error('widget mount failed:', slug, e); } }
+								}
 							}
-
-							if (!doc) {
-								return;
+							function activeSlug() {
+								var t = document.querySelector('.status-dashboard-tab.is-active');
+								return t ? t.getAttribute('data-status-tab') : null;
 							}
-
-							body = doc.body;
-							html = doc.documentElement;
-
-							if (!body || !html) {
-								return;
+							function mountActive() { mount(activeSlug()); }
+							if (document.readyState === 'loading') {
+								document.addEventListener('DOMContentLoaded', mountActive);
+							} else {
+								mountActive();
 							}
-
-							height = Math.max(
-								body.scrollHeight,
-								body.offsetHeight,
-								html.clientHeight,
-								html.scrollHeight,
-								html.offsetHeight
-							);
-
-							if (height > 0) {
-								frame.style.height = height + 'px';
-							}
-						}
-
-						function observeFrame() {
-							var doc;
-
-							resizeFrame();
-
-							try {
-								doc = frame.contentDocument || frame.contentWindow.document;
-							} catch (error) {
-								return;
-							}
-
-							if (!doc || !window.ResizeObserver) {
-								return;
-							}
-
-							new ResizeObserver(resizeFrame).observe(doc.documentElement);
-
-							if (doc.body) {
-								new ResizeObserver(resizeFrame).observe(doc.body);
-							}
-						}
-
-						frame.addEventListener('load', observeFrame);
-						window.addEventListener('resize', resizeFrame);
-
-						setTimeout(observeFrame, 250);
-						setTimeout(observeFrame, 1000);
-						setTimeout(observeFrame, 2500);
-					})();
-				</script>
+							document.addEventListener('click', function (e) {
+								var tab = e.target.closest && e.target.closest('[data-status-tab]');
+								if (tab) { setTimeout(function () { mount(tab.getAttribute('data-status-tab')); }, 0); }
+							});
+							window.addEventListener('hashchange', function () { setTimeout(mountActive, 0); });
+						})();
+					</script>
 			</article>
 		<?php endwhile; ?>
 	</div>
