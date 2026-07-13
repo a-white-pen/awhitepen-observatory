@@ -24,9 +24,10 @@
     insurance: { label: "Insurance", sub: "monthly premium", color: "oklch(0.58 0.07 250)", bucket: "fixed" },
     rent: { label: "Rent", sub: "housing & common fees", color: "oklch(0.46 0.04 240)", bucket: "fixed" },
     installment: { label: "Instalment", sub: "big-ticket buys, monthly", color: "oklch(0.55 0.10 200)", bucket: "fixed" },
-    travel: { label: "Travel", sub: "one-off trips", color: "oklch(0.67 0.17 50)", bucket: "oneoff" }
+    travel: { label: "Travel", sub: "one-off trips", color: "oklch(0.67 0.17 50)", bucket: "oneoff" },
+    oneoff: { label: "One-off", sub: "non-daily & not-mine", color: "oklch(0.62 0.11 15)", bucket: "oneoff" }
   };
-  var CATEGORY_ORDER = ["meals", "dining", "groceries", "transport", "utilities", "others", "subscriptions", "insurance", "rent", "installment", "travel"];
+  var CATEGORY_ORDER = ["meals", "dining", "groceries", "transport", "utilities", "others", "subscriptions", "insurance", "rent", "installment", "travel", "oneoff"];
   var RAW_TO_CAT = {
     food: "meals",
     meals: "meals",
@@ -57,7 +58,9 @@
     instalment: "installment",
     travel: "travel",
     trip: "travel",
-    vacation: "travel"
+    vacation: "travel",
+    "one-off": "oneoff",
+    oneoff: "oneoff"
   };
   function catKeyFromRaw(raw) {
     const k = (raw || "").toString().trim().toLowerCase();
@@ -813,9 +816,9 @@
     const cat = CATEGORIES[e.catKey];
     return /* @__PURE__ */ React.createElement("div", { className: "spend-row" }, /* @__PURE__ */ React.createElement("span", { className: "spend-dot", style: { background: cat.color } }), /* @__PURE__ */ React.createElement("div", { className: "spend-main" }, /* @__PURE__ */ React.createElement("div", { className: "spend-title" }, e.merchant, /* @__PURE__ */ React.createElement("span", { className: "spend-cat", style: { color: cat.color } }, "\xB7 ", cat.label)), (e.desc || e.platform) && /* @__PURE__ */ React.createElement("div", { className: "spend-sub" }, e.desc, e.platform ? (e.desc ? " \xB7 " : "") + e.platform : "")), /* @__PURE__ */ React.createElement("div", { className: "spend-amt-wrap" }, /* @__PURE__ */ React.createElement("div", { className: "spend-amt" }, money(e.sgd))));
   }
-  function SpendTable({ days, dayTotal }) {
+  function SpendTable({ days, dayTotal, footLabel }) {
     if (!days.length) return /* @__PURE__ */ React.createElement("div", { style: { padding: "48px 0", textAlign: "center", color: "var(--muted)" } }, "No entries this month.");
-    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column" } }, days.map((d) => /* @__PURE__ */ React.createElement("div", { key: d.date, className: "spend-day" }, /* @__PURE__ */ React.createElement("div", { className: "day-head" }, /* @__PURE__ */ React.createElement("span", { className: "day-date" }, d.weekday, " ", d.dayNum, " ", d.monAbbr), /* @__PURE__ */ React.createElement("span", { className: "day-total" }, money(d.total))), d.items.map((e) => /* @__PURE__ */ React.createElement(SpendRow, { key: e.id, e }))))), /* @__PURE__ */ React.createElement("div", { className: "table-foot" }, /* @__PURE__ */ React.createElement("span", null, "Day-to-day total \xB7 ", days.length, " ", days.length === 1 ? "day" : "days"), /* @__PURE__ */ React.createElement("span", { className: "table-foot-amt" }, s$(dayTotal))));
+    return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column" } }, days.map((d) => /* @__PURE__ */ React.createElement("div", { key: d.date, className: "spend-day" }, /* @__PURE__ */ React.createElement("div", { className: "day-head" }, /* @__PURE__ */ React.createElement("span", { className: "day-date" }, d.weekday, " ", d.dayNum, " ", d.monAbbr), /* @__PURE__ */ React.createElement("span", { className: "day-total" }, money(d.total))), d.items.map((e) => /* @__PURE__ */ React.createElement(SpendRow, { key: e.id, e }))))), /* @__PURE__ */ React.createElement("div", { className: "table-foot" }, /* @__PURE__ */ React.createElement("span", null, (footLabel || "Day-to-day total") + " \xB7 ", days.length, " ", days.length === 1 ? "day" : "days"), /* @__PURE__ */ React.createElement("span", { className: "table-foot-amt" }, s$(dayTotal))));
   }
   var SC_WDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var SC_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -973,6 +976,8 @@
     const breakdownTotal = cats.reduce((a, c) => a + c.value, 0);
     const everydayRows = useMemo(() => monthRows.filter((e) => e.bucket === "everyday"), [monthRows]);
     const days = useMemo(() => groupByDay(everydayRows, tweaks.order === "newest"), [everydayRows, tweaks.order]);
+    const oneoffRows = useMemo(() => monthRows.filter((e) => e.bucket === "oneoff"), [monthRows]);
+    const oneoffDays = useMemo(() => groupByDay(oneoffRows, tweaks.order === "newest"), [oneoffRows, tweaks.order]);
     const mIdx = months.indexOf(monthKey);
     const ms = monthKey ? monthShort(monthKey) : "\u2014";
     const breakdownTitle = tweaks.includeOneoff ? "Where the month's money went" : tweaks.includeFixed ? "Summary breakdown \u2014 incl. fixed" : "Summary breakdown";
@@ -1006,7 +1011,7 @@
         onToggleFixed: () => setTweak("includeFixed", !tweaks.includeFixed),
         onToggleOneoff: () => setTweak("includeOneoff", !tweaks.includeOneoff)
       }
-    ), tweaks.breakdownViz === "donut" ? /* @__PURE__ */ React.createElement(Donut, { cats, total: breakdownTotal, label: "day-to-day", monthRows }) : /* @__PURE__ */ React.createElement(Bars, { cats, total: breakdownTotal })), /* @__PURE__ */ React.createElement("section", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-head" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "card-title", style: { margin: 0 } }, "Day-to-day spending"), /* @__PURE__ */ React.createElement("div", { className: "card-subtitle" }, "Chronological \xB7 grouped by day \xB7 ", everydayRows.length, " entries \xB7 amounts in SGD"))), /* @__PURE__ */ React.createElement(SpendTable, { days, dayTotal: totals.everyday })), tweaks.showSelfCare && /* @__PURE__ */ React.createElement(SelfCareSketch, null), /* @__PURE__ */ React.createElement(Notes, null), /* @__PURE__ */ React.createElement("footer", { className: "foot" }, "data via Cloud SQL \xB7 15-minute delay, by design"))), window.TweaksPanel && /* @__PURE__ */ React.createElement(window.TweaksPanel, { title: "Tweaks" }, /* @__PURE__ */ React.createElement(window.TweakSection, { label: "Breakdown" }, /* @__PURE__ */ React.createElement(
+    ), tweaks.breakdownViz === "donut" ? /* @__PURE__ */ React.createElement(Donut, { cats, total: breakdownTotal, label: "day-to-day", monthRows }) : /* @__PURE__ */ React.createElement(Bars, { cats, total: breakdownTotal })), /* @__PURE__ */ React.createElement("section", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-head" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "card-title", style: { margin: 0 } }, "Day-to-day spending"), /* @__PURE__ */ React.createElement("div", { className: "card-subtitle" }, "Chronological \xB7 grouped by day \xB7 ", everydayRows.length, " entries \xB7 amounts in SGD"))), /* @__PURE__ */ React.createElement(SpendTable, { days, dayTotal: totals.everyday })), oneoffRows.length > 0 && /* @__PURE__ */ React.createElement("section", { className: "card" }, /* @__PURE__ */ React.createElement("div", { className: "card-head" }, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h2", { className: "card-title", style: { margin: 0 } }, "One-off expenses"), /* @__PURE__ */ React.createElement("div", { className: "card-subtitle" }, "Not counted in day-to-day \xB7 ", oneoffRows.length, " entries \xB7 amounts in SGD"))), /* @__PURE__ */ React.createElement(SpendTable, { days: oneoffDays, dayTotal: totals.oneoff, footLabel: "One-off total" })), tweaks.showSelfCare &&/* @__PURE__ */ React.createElement(SelfCareSketch, null), /* @__PURE__ */ React.createElement(Notes, null), /* @__PURE__ */ React.createElement("footer", { className: "foot" }, "data via Cloud SQL \xB7 15-minute delay, by design"))), window.TweaksPanel && /* @__PURE__ */ React.createElement(window.TweaksPanel, { title: "Tweaks" }, /* @__PURE__ */ React.createElement(window.TweakSection, { label: "Breakdown" }, /* @__PURE__ */ React.createElement(
       window.TweakRadio,
       {
         label: "Chart",
