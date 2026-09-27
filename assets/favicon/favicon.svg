@@ -1,13 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <g transform="rotate(34 32 32)" stroke="#000" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="25" y="6" width="14" height="14" rx="3.5" stroke-width="5.2" />
-    <path d="M24 21.5H40" stroke-width="4.2" />
-    <path
-      d="M32 21.8C39.2 21.8 44.5 27 45.1 34L35.6 57.3C35.1 58.8 33.7 59.8 32 59.8C30.3 59.8 28.9 58.8 28.4 57.3L18.9 34C19.5 27 24.8 21.8 32 21.8Z"
-      stroke-width="5.2"
-    />
-    <path d="M32 56.8V33.2" stroke-width="3.6" />
-    <circle cx="32" cy="30.8" r="3.1" stroke-width="3.1" />
-    <path d="M32 60.2C30.3 62.6 27.9 64.3 25 64.9C22.7 65.4 20.5 65.1 18.4 64" stroke-width="2.8" />
-  </g>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="awhitepen fountain pen mark">
+
+<g transform="rotate(38 32 32)">
+  
+  <rect x="24.5" y="8" width="15" height="26.5" rx="7.2" fill="#35618E"></rect>
+  
+  <rect x="35.6" y="11" width="3.4" height="17" rx="1.7" fill="#C9A24B"></rect>
+  
+  <rect x="23.8" y="33.2" width="16.4" height="4.8" rx="1.4" fill="#C9A24B"></rect>
+  
+  <path d="M27 38 H37 L35 43 H29 Z" fill="#28496A"></path>
+  
+  <path d="M27 42.5 H37 C37 48 34.6 53 32 57.5 C29.4 53 27 48 27 42.5 Z" fill="#C9A24B" stroke="#A07D2C" stroke-width="0.9"></path>
+  
+  <circle cx="32" cy="46" r="1.9" fill="#16140E"></circle>
+  <path d="M32 47.6 V56.4" stroke="#16140E" stroke-width="1.7" stroke-linecap="round"></path>
+</g>
 </svg>

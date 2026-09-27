@@ -1,3 +1,11 @@
+/**
+ * Classic Editor chrome.
+ *
+ * The toolbar is TinyMCE's own markup, restyled to sit on the post it edits.
+ * Tokens match the design: surface #FFFFFF, edge #E5E0D5, hover #F4F2EC,
+ * pressed #35618E on #FFFFFF, focus ring #35618E, page #F4F2EC.
+ */
+
 /* Keep Classic Editor publish actions left-aligned and calm. */
 #minor-publishing-actions {
 	text-align: left;
@@ -7,4 +15,376 @@
 #minor-publishing-actions .preview.button {
 	float: none;
 	margin: 0;
+}
+
+/* ---------- shell ---------- */
+
+.wp-editor-wrap .mce-panel {
+	background: #fff;
+	border-color: #e5e0d5;
+}
+
+.wp-editor-wrap .mce-toolbar-grp {
+	background: #fff;
+	border-bottom: 1px solid #e5e0d5;
+	padding: 5px 4px;
+}
+
+.wp-editor-wrap .mce-toolbar-grp .mce-toolbar {
+	padding: 0;
+}
+
+/* Row two sits under row one in the same bar, separated by space only. */
+.wp-editor-wrap .mce-toolbar-grp .mce-toolbar + .mce-toolbar {
+	margin-top: 3px;
+}
+
+.wp-editor-wrap .mce-btn-group:not(:first-child) {
+	margin-left: 0;
+	padding-left: 0;
+	border-left: 0;
+}
+
+/* Groups are set apart by space, not rules, so a wrapped row never starts
+   with a stray divider. A group also stays whole when the bar wraps. */
+.wp-editor-wrap .mce-toolbar .mce-flow-layout {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	row-gap: 3px;
+}
+
+.wp-editor-wrap .mce-btn-group {
+	display: inline-flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	margin: 0 9px 0 0;
+}
+
+.wp-editor-wrap .mce-btn-group .mce-btn {
+	margin: 1px;
+	border: 0;
+	border-radius: 8px;
+	background: none;
+	box-shadow: none;
+}
+
+/* ---------- buttons ---------- */
+
+.wp-editor-wrap .mce-btn button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	min-width: 32px;
+	height: 32px;
+	padding: 0 6px;
+	border-radius: 8px;
+	color: #201d16;
+	font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-weight: 600;
+	font-size: 13.5px;
+	line-height: 1;
+}
+
+/* TinyMCE ships the icon as a 20px box with 5px padding. Drop the padding and
+   let the button do the centring, so every icon sits on the same line. */
+.wp-editor-wrap .mce-btn .mce-ico {
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	font-size: 16px;
+	line-height: 20px;
+	color: #201d16;
+}
+
+/* Text buttons read left, caret right. */
+.wp-editor-wrap .mce-btn.mce-btn-has-text button {
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.wp-editor-wrap .mce-btn:hover,
+.wp-editor-wrap .mce-btn:focus {
+	background: #f4f2ec;
+	border: 0;
+	box-shadow: none;
+}
+
+.wp-editor-wrap .mce-btn:hover button,
+.wp-editor-wrap .mce-btn:focus button,
+.wp-editor-wrap .mce-btn:hover .mce-ico,
+.wp-editor-wrap .mce-btn:focus .mce-ico {
+	color: #201d16;
+}
+
+/* Pressed: the mark under the cursor is on. */
+.wp-editor-wrap .mce-btn.mce-active,
+.wp-editor-wrap .mce-btn.mce-active:hover,
+.wp-editor-wrap .mce-toolbar .mce-btn.mce-active {
+	background: #35618e;
+	border: 0;
+	box-shadow: none;
+}
+
+.wp-editor-wrap .mce-btn.mce-active button,
+.wp-editor-wrap .mce-btn.mce-active .mce-ico,
+.wp-editor-wrap .mce-btn.mce-active:hover .mce-ico {
+	color: #fff;
+}
+
+/* Keyboard focus, told apart from hover by a ring. */
+.wp-editor-wrap .mce-btn button:focus-visible,
+.wp-editor-wrap .mce-btn.mce-btn-has-text button:focus-visible {
+	outline: 0;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #35618e;
+}
+
+/* Nothing to act on, e.g. Remove link with no link under the cursor. */
+.wp-editor-wrap .mce-btn.mce-disabled button,
+.wp-editor-wrap .mce-btn.mce-disabled .mce-ico {
+	color: #857e70;
+	opacity: 0.5;
+}
+
+.wp-editor-wrap .mce-btn.mce-disabled:hover {
+	background: none;
+}
+
+/* ---------- select menus (Paragraph, Size) ---------- */
+
+.wp-editor-wrap .mce-btn-group .mce-btn.mce-listbox,
+.wp-editor-wrap .mce-btn-group .mce-btn.mce-menubtn.mce-btn-has-text {
+	border: 1px solid #e5e0d5;
+	border-radius: 8px;
+	background: #fff;
+}
+
+.wp-editor-wrap .mce-listbox button,
+.wp-editor-wrap .mce-menubtn.mce-btn-has-text button {
+	padding: 0 8px 0 12px;
+	height: 32px;
+}
+
+.wp-editor-wrap .mce-btn.mce-listbox:hover,
+.wp-editor-wrap .mce-btn.mce-menubtn.mce-btn-has-text:hover {
+	border-color: #cfc8ba;
+	background: #f4f2ec;
+}
+
+.wp-editor-wrap .mce-btn.mce-listbox.mce-active,
+.wp-editor-wrap .mce-btn.mce-menubtn.mce-btn-has-text.mce-active {
+	border-color: #35618e;
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(53, 97, 142, 0.16);
+}
+
+.wp-editor-wrap .mce-btn.mce-listbox.mce-active button,
+.wp-editor-wrap .mce-btn.mce-menubtn.mce-btn-has-text.mce-active button,
+.wp-editor-wrap .mce-btn.mce-listbox.mce-active .mce-caret,
+.wp-editor-wrap .mce-btn.mce-menubtn.mce-btn-has-text.mce-active .mce-caret {
+	color: #201d16;
+}
+
+.wp-editor-wrap .mce-caret {
+	border-top-color: #857e70;
+	margin-left: 6px;
+}
+
+/* ---------- dropdown menus ---------- */
+
+.mce-panel.mce-menu {
+	border: 1px solid #e5e0d5;
+	border-radius: 12px;
+	box-shadow: 0 14px 36px rgba(22, 20, 14, 0.14), 0 2px 6px rgba(22, 20, 14, 0.06);
+	padding: 6px;
+	background: #fff;
+}
+
+.mce-panel.mce-menu .mce-menu-item {
+	border-radius: 8px;
+	padding: 8px 12px;
+	color: #201d16;
+	font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 14px;
+}
+
+.mce-panel.mce-menu .mce-menu-item:hover,
+.mce-panel.mce-menu .mce-menu-item.mce-selected,
+.mce-panel.mce-menu .mce-menu-item:focus {
+	background: #f4f2ec;
+	color: #201d16;
+}
+
+.mce-panel.mce-menu .mce-menu-item:hover .mce-text,
+.mce-panel.mce-menu .mce-menu-item.mce-selected .mce-text,
+.mce-panel.mce-menu .mce-menu-item:hover .mce-ico,
+.mce-panel.mce-menu .mce-menu-item.mce-selected .mce-ico {
+	color: #201d16;
+}
+
+/* The size hint on the right of a Size menu row. */
+.mce-panel.mce-menu .mce-menu-item .mce-menu-shortcut {
+	font-family: "IBM Plex Mono", ui-monospace, monospace;
+	font-size: 11.5px;
+	color: #857e70;
+	padding-left: 18px;
+}
+
+.mce-panel.mce-menu .mce-menu-item.mce-selected .mce-menu-shortcut {
+	color: #857e70;
+}
+
+/* The tick on the row that is currently applied. */
+.mce-panel.mce-menu .mce-menu-item.mce-active .mce-ico,
+.mce-panel.mce-menu .mce-menu-item .mce-caret {
+	color: #35618e;
+}
+
+.mce-panel.mce-menu .mce-menu-item-sep,
+.mce-panel.mce-menu .mce-menu-item.mce-disabled.mce-menu-item-sep {
+	height: 1px;
+	margin: 6px 4px;
+	background: #e5e0d5;
+	padding: 0;
+	border: 0;
+}
+
+/* Paragraph and heading rows preview their own style. */
+.mce-panel.mce-menu .mce-menu-item[aria-label="Heading 2"] .mce-text,
+.mce-panel.mce-menu .mce-menu-item[aria-label="Heading 3"] .mce-text,
+.mce-panel.mce-menu .mce-menu-item[aria-label="Heading 4"] .mce-text {
+	font-family: "Schibsted Grotesk", Figtree, sans-serif;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+/* ---------- colour buttons and swatches ---------- */
+
+/* The A and its caret are two buttons in one widget. Without this the caret
+   half takes the full 32px and floats away from the letter. */
+.wp-editor-wrap .mce-colorbutton {
+	display: inline-flex;
+	align-items: center;
+}
+
+.wp-editor-wrap .mce-colorbutton > button {
+	min-width: 28px;
+	padding: 0 2px 0 6px;
+}
+
+.wp-editor-wrap .mce-colorbutton .mce-open {
+	min-width: 0;
+	width: 16px;
+	height: 32px;
+	padding: 0;
+	border: 0;
+}
+
+/* The colour bar under the A. */
+.wp-editor-wrap .mce-colorbutton .mce-preview {
+	height: 3px;
+	border-radius: 2px;
+	margin-left: -8px;
+	margin-top: 6px;
+	padding-right: 0;
+	width: 16px;
+}
+
+.mce-grid td .mce-colorbutton,
+.mce-grid a {
+	border-radius: 8px;
+	box-shadow: inset 0 0 0 1px rgba(22, 20, 14, 0.14);
+}
+
+.mce-grid a:hover,
+.mce-grid a:focus {
+	border-color: #35618e;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #35618e;
+}
+
+/* No custom colour picker: the palette is the design tokens and nothing else. */
+.mce-grid .mce-custom-color-btn {
+	display: none;
+}
+
+/* ---------- dialogs ---------- */
+
+.mce-window {
+	border-radius: 12px;
+	border: 1px solid #e5e0d5;
+	box-shadow: 0 18px 44px rgba(22, 20, 14, 0.16);
+	overflow: hidden;
+}
+
+.mce-window .mce-window-head {
+	border-bottom: 1px solid #e5e0d5;
+	padding: 14px 18px;
+}
+
+.mce-window .mce-window-head .mce-title {
+	font-family: "Schibsted Grotesk", Figtree, sans-serif;
+	font-weight: 700;
+	font-size: 17px;
+	letter-spacing: -0.01em;
+	color: #201d16;
+	line-height: 1.2;
+}
+
+.mce-window .mce-textbox {
+	border: 1px solid #e5e0d5;
+	border-radius: 8px;
+	box-shadow: none;
+	font-size: 15px;
+	color: #201d16;
+}
+
+.mce-window .mce-textbox:focus {
+	border-color: #35618e;
+	box-shadow: 0 0 0 3px rgba(53, 97, 142, 0.16);
+}
+
+.mce-window .mce-btn {
+	border: 1px solid #e5e0d5;
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: none;
+}
+
+.mce-window .mce-btn button {
+	font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-weight: 600;
+	font-size: 13.5px;
+	color: #201d16;
+}
+
+.mce-window .mce-primary {
+	background: #35618e;
+	border-color: #35618e;
+}
+
+.mce-window .mce-primary button {
+	color: #fff;
+}
+
+.mce-window .mce-primary:hover {
+	background: #28496a;
+	border-color: #28496a;
+}
+
+/* ---------- link dialog ---------- */
+
+.awhitepen-link-newtab {
+	margin: 6px 0 0;
+	padding: 0 4px;
+	font-family: Figtree, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: #201d16;
+}
+
+.awhitepen-link-newtab span {
+	color: #35618e;
+	font-weight: 600;
+	margin-right: 4px;
 }

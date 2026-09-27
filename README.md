@@ -2,7 +2,7 @@
 
 Current version: `1.0.0`
 
-`AWhitePen Observatory` is a custom classic WordPress theme for `awhitepen.com`, vibe-coded by B with the help of Codex.
+`AWhitePen Observatory` is a custom classic WordPress theme for `awhitepen.com`, vibe-coded by B with the help of Codex. It has since been updated with the help of Claude.
 
 It is built as a personal editorial observatory for writing, publishing, experimenting, reflecting, and occasionally venting on the internet.
 
@@ -41,7 +41,8 @@ The canonical front-end asset setup is:
 - front-end styles are loaded from `assets/css/main.css`
 - front-end scripts are loaded from `assets/js/main.js`
 - Classic Editor enhancements are loaded from `assets/js/classic-editor-*.js` and `assets/css/classic-editor-*.css` in wp-admin/editor contexts
-- favicon/app icons and brand assets are stored under `assets/` (including `assets/favicon/` and `assets/img/`)
+- status dashboard styles and scripts are loaded from `assets/css/status.css` and `assets/js/status-shared.js` plus one file per tab
+- favicon and app icons are stored under `assets/favicon/`, all generated from `favicon.svg` by `generate-favicon.sh`
 
 ## File tree
 
@@ -53,16 +54,20 @@ The canonical front-end asset setup is:
 ├── README.md
 ├── archive.php
 ├── assets/
+├── design/
+│   ├── design-system.md
+│   └── style-guide.html
 ├── category.php
 ├── footer.php
-├── front-page.php
 ├── functions.php
 ├── header.php
-├── home.php
 ├── index.php
+├── page-portfolio.php
+├── page-status.php
 ├── page.php
 ├── search.php
 ├── searchform.php
 ├── single.php
-└── style.css
+├── style.css
+└── template-parts/
 ```

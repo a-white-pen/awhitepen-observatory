@@ -1,0 +1,541 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>awhitepen — signature style</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ============================================================
+   awhitepen — signature style, one self-contained page.
+   READ THIS FIRST if you are an agent building a sister site
+   (project-b, back-to-office). Everything below the token block
+   is a live demo of the system: what you see rendered is what
+   the CSS produces. To reuse: copy the :root/[data-theme] block,
+   add the font <link> above, then follow the four laws (§ Rules).
+   The token values here ARE the awhitepen build's values.
+   ============================================================ */
+
+/* ---- FOUNDATION TOKENS — copy this block verbatim ---- */
+:root{
+  /* chrome */
+  --bg:#F4F2EC;--surface:#FFFFFF;--surface-alt:#FAF7F0;
+  --text:#201D16;--muted:#857E70;--soft:#6F695E;
+  --edge:#E5E0D5;--edge-strong:#201D16;
+  --rule:color-mix(in oklch,var(--muted) 55%,transparent);
+  --grid:rgba(33,29,22,.085);
+  /* ink — header and footer, dark in both themes */
+  --ink:#16140E;--ink-fg:#F3EFE6;--ink-muted:rgba(243,239,230,.62);
+  --ink-line:rgba(243,239,230,.12);
+  /* accent */
+  --accent:#35618E;--accent-dk:#28496A;--accent-ink:#3C6A97;
+  --accent-soft:rgba(53,97,142,.10);--accent-out:rgba(53,97,142,.30);
+  --on-accent:#FFFFFF;--on-accent-2:rgba(255,255,255,.88);
+  --on-accent-3:rgba(255,255,255,.6);--on-accent-line:rgba(255,255,255,.22);
+  /* data — dusty for identity and state */
+  --d-red:#B9695E;--d-gold:#BC9152;--d-teal:#5E93A1;--d-green:#5D9375;
+  --d-plum:#8571A8;--d-blue:#6E869E;--d-grey:#8C8A87;
+  /* data — vivid for series and small marks */
+  --c-red:#E04A3A;--c-gold:#E0991C;--c-teal:#2BA8C0;--c-green:#23A35E;
+  --c-plum:#8E5BC0;--c-tan:#B79A6B;--c-blue:#5E7A99;--c-orange:#DE6F00;
+  --c-gridline:#EBE5D9;
+  /* semantic */
+  --good:#1F9A86;--alert:#D23B2C;--code-bg:#5A554C;--code-fg:#F3EFE6;
+  /* prose */
+  --text-body:color-mix(in srgb,var(--text) 86%,var(--bg));
+  --surface-sunk:color-mix(in srgb,var(--text) 4%,var(--bg));
+  --qgrid:rgba(33,29,22,.05);
+  /* skeleton */
+  --sk-fill:var(--c-gridline);--sk-glint:var(--surface-alt);
+  --sk-fill-on:var(--on-accent-line);--sk-glint-on:rgba(255,255,255,.34);
+  /* type */
+  --display:'Schibsted Grotesk','Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  --body:'Figtree','Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  /* space */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;
+  --s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  /* shape */
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-pill:999px;
+  /* layout */
+  --measure:828px;--text-measure:740px;--quote-measure:620px;--wide:1120px;
+  --gutter:44px;--header-h:78px;
+  /* depth and motion */
+  --shadow-hover:0 10px 24px rgba(33,29,22,.12);
+  --shadow-menu:0 18px 44px rgba(0,0,0,.4);
+  --shadow-tip:0 6px 20px rgba(32,29,22,.14);
+  --ease:.16s ease;
+  /* component tokens used by the demos below */
+  --fast-fill:color-mix(in oklch,var(--accent) 34%,transparent);
+  --stepper-label-w:8.8em;
+}
+[data-theme="dark"]{
+  --bg:#262320;--surface:#302C26;--surface-alt:#363021;
+  --text:#EFEAE0;--muted:#ABA08D;--soft:#C4BAA9;
+  --edge:#3B362D;--edge-strong:#6E6656;--grid:rgba(243,239,230,.055);
+  --ink:#1C1A15;--ink-fg:#F3EFE6;--ink-muted:rgba(243,239,230,.58);
+  --ink-line:rgba(243,239,230,.12);
+  --accent:#82A9D0;--accent-dk:#9CBBDD;--accent-ink:#82A9D0;
+  --accent-soft:rgba(130,169,208,.16);--accent-out:rgba(130,169,208,.40);
+  --on-accent:#16140E;--on-accent-2:rgba(22,20,14,.84);
+  --on-accent-3:rgba(22,20,14,.55);--on-accent-line:rgba(22,20,14,.22);
+  --d-red:#CE8478;--d-gold:#D3A768;--d-teal:#7BAEBD;--d-green:#79B292;
+  --d-plum:#A48CC4;--d-blue:#8DA3BD;--d-grey:#A8A6A2;
+  --c-red:#F0604E;--c-gold:#E9AE3E;--c-teal:#46BBD0;--c-green:#3FB873;
+  --c-plum:#A877D6;--c-tan:#CBB07E;--c-blue:#86A2C0;--c-orange:#F48D2F;
+  --c-gridline:rgba(243,239,230,.12);
+  --good:#3FB873;--alert:#E2645A;
+  --qgrid:rgba(239,234,224,.045);
+  --sk-fill:var(--edge);--sk-glint:var(--c-gridline);
+  --sk-fill-on:var(--on-accent-line);--sk-glint-on:rgba(22,20,14,.08);
+}
+
+/* ---- page scaffolding (sg- prefix = this styleguide only, NOT part of the system) ---- */
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;pointer-events:none;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:26px 26px;-webkit-mask-image:radial-gradient(120% 120% at 100% 100%,#000 0,transparent 62%);mask-image:radial-gradient(120% 120% at 100% 100%,#000 0,transparent 62%)}
+.sg-wrap{position:relative;z-index:1;width:min(100% - 48px,var(--wide));margin:0 auto;padding:48px 0 120px}
+.sg-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.sg-mark{display:flex;align-items:center;gap:16px}
+.sg-mark svg{width:38px;height:auto;flex:none}
+.sg-eyebrow{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.sg-h1{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,52px);letter-spacing:-.03em;line-height:1.02;margin-top:8px;text-wrap:balance}
+.sg-lede{margin-top:16px;max-width:60ch;font-size:18px;line-height:1.6;color:var(--muted);text-wrap:pretty}
+.theme-toggle{flex:none;display:inline-flex;align-items:center;gap:8px;font-family:var(--body);font-weight:600;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--text);background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-pill);padding:9px 16px;cursor:pointer;transition:border-color var(--ease)}
+.theme-toggle:hover{border-color:var(--accent)}
+.sg-sec{margin-top:72px}
+.sg-sec__k{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.sg-sec__h{font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.02em;margin-top:8px}
+.sg-sec__d{margin-top:10px;max-width:70ch;font-size:15px;line-height:1.6;color:var(--muted);text-wrap:pretty}
+.sg-sub{font-family:var(--body);font-weight:600;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:32px 0 14px}
+.sg-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(196px,1fr))}
+.sw{border:1px solid var(--edge);border-radius:var(--r-md);overflow:hidden;background:var(--surface)}
+.sw__c{height:72px;border-bottom:1px solid var(--edge)}
+.sw__m{padding:10px 12px}
+.sw__n{font-family:var(--mono);font-size:12px;color:var(--text)}
+.sw__v{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.sw__u{font-size:11.5px;color:var(--muted);margin-top:5px;text-wrap:pretty}
+.sg-cards{display:grid;gap:22px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-items:start}
+.sg-note{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5}
+.sg-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+pre.sg-code{margin-top:16px;background:var(--code-bg);color:var(--code-fg);border-radius:var(--r-md);padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6;white-space:pre}
+.sg-law{display:grid;gap:10px;margin-top:16px;counter-reset:law}
+.sg-law li{list-style:none;display:flex;gap:14px;align-items:baseline;font-size:15px;line-height:1.5}
+.sg-law li::before{counter-increment:law;content:counter(law);font-family:var(--display);font-weight:700;font-size:18px;color:var(--accent);flex:none;width:1.4em}
+.sg-tbl{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px}
+.sg-tbl th{text-align:left;font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 14px 8px 0;border-bottom:1px solid var(--edge)}
+.sg-tbl td{padding:9px 14px 9px 0;border-bottom:1px solid var(--edge);color:var(--text);vertical-align:baseline;text-wrap:pretty}
+.sg-tbl td.tok{font-family:var(--mono);font-size:12px;color:var(--accent);white-space:nowrap}
+
+/* ---- TYPE specimens ---- */
+.ty-title{font-family:var(--display);font-weight:700;font-size:48px;line-height:1.02;letter-spacing:-.03em}
+.ty-h2{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.02em}
+.ty-card{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.02em;line-height:1.14}
+.ty-lede{font-size:22px;font-weight:500;line-height:1.4;color:var(--text)}
+.ty-body{font-size:19px;line-height:1.65;color:var(--text-body);max-width:var(--text-measure)}
+.ty-meta{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ty-eyebrow{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.ty-spec{padding:14px 0;border-bottom:1px solid var(--edge)}
+.ty-spec small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:6px;text-transform:none;letter-spacing:0}
+
+/* ---- SPACE / SHAPE ---- */
+.sp-row{display:flex;align-items:center;gap:14px;margin-top:9px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.sp-bar{height:16px;background:var(--accent);border-radius:2px;flex:none}
+.rad{display:flex;flex-direction:column;align-items:center;gap:8px}
+.rad i{width:96px;height:64px;background:var(--accent-soft);border:1px solid var(--accent-out)}
+.rad b{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+
+/* ============================================================
+   SYSTEM COMPONENT CSS — verbatim from the awhitepen build
+   (css/base.css + build/status.css). Lift these as-is.
+   ============================================================ */
+.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,28px)}
+.whead{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px 20px;margin-bottom:20px}
+.whead__k{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.whead__l{margin-top:7px;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em;color:var(--text)}
+.whead__note{font-size:12px;letter-spacing:.04em;color:var(--muted);text-align:right}
+.wfoot{margin-top:16px;padding-top:14px;border-top:1px dotted var(--rule);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.wfoot .ac{color:var(--accent)}
+.readout{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.03em;line-height:1}
+.readout small{font-family:var(--body);font-size:12.5px;font-weight:500;color:var(--muted);margin-left:5px;letter-spacing:0}
+.hero-amt{font-family:var(--display);font-weight:700;font-size:clamp(38px,6vw,56px);letter-spacing:-.03em;line-height:1;font-variant-numeric:proportional-nums}
+.hero-amt small{font-size:15px;margin-left:8px;color:var(--muted);font-weight:500;font-family:var(--body)}
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;padding-top:14px;border-top:1px dotted var(--rule)}
+.legend__i{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;letter-spacing:.02em;color:var(--muted)}
+.legend__sw{width:10px;height:10px;border-radius:3px;flex:none}
+.legend__sw--dot{width:8px;height:8px;border-radius:var(--r-pill)}
+.legend__sw--line{height:2px;border-radius:2px;width:14px}
+.legend__sw--dotline{width:16px;height:0;border-top:2px dotted currentColor;border-radius:0;background:none!important}
+.legend__sw--avg{background:var(--accent)}
+.legend__sw--weight{background:var(--accent);opacity:.6}
+.legend__sw--in{background:var(--d-green)}
+.legend__sw--out{background:var(--d-grey)}
+.legend__sw--fasting{background:var(--fast-fill);border:1px solid var(--accent)}
+.legend__sw--unlogged{border:1px dashed var(--rule)}
+/* chips */
+.tchip{padding:6px 13px;border:1px solid var(--edge);border-radius:var(--r-pill);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;display:inline-block}
+.tchip--done{background:var(--good);border-color:var(--good);color:#16140E}
+.tchip--in{background:color-mix(in oklch,var(--good) 18%,transparent);border-color:transparent;color:var(--good)}
+.tchip--over{background:color-mix(in oklch,var(--alert) 15%,transparent);border-color:transparent;color:var(--alert)}
+.tchip--togo{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tchip--none{background:var(--edge);border-color:transparent;color:var(--soft)}
+/* segmented control */
+.brng,.bsw{display:inline-flex;border:1px solid var(--edge);border-radius:var(--r-pill);padding:2px;gap:2px}
+.brng button{font-family:var(--body);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:5px 12px;border-radius:var(--r-pill);cursor:pointer;white-space:nowrap}
+.brng button:hover{color:var(--accent)}
+.brng button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+/* stepper */
+.bpan{display:inline-flex;align-items:center;gap:6px}
+.bpan button{display:inline-flex;align-items:center;justify-content:center;width:29px;height:29px;border:1px solid var(--edge);border-radius:var(--r-pill);background:var(--surface);color:var(--muted);cursor:pointer;transition:border-color var(--ease),color var(--ease)}
+.bpan button:hover{border-color:var(--accent);color:var(--accent)}
+.bpan button svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bpan__lab{font-size:12.5px;font-weight:600;color:var(--text);min-width:var(--stepper-label-w);text-align:center;font-variant-numeric:tabular-nums}
+/* failure card */
+.serr__k{display:flex;align-items:center;gap:8px;margin:0;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.serr__dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--alert)}
+.serr__dot--rate{background:var(--d-gold)}
+.serr__h{margin:12px 0 0;max-width:20em;font-family:var(--display);font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.1;letter-spacing:-.025em;color:var(--text);text-wrap:balance}
+.serr__p{margin:14px 0 0;max-width:36rem;font-size:16px;line-height:1.55;color:var(--soft);text-wrap:pretty}
+.serr__p b{font-weight:700;color:var(--text)}
+.lmore{display:inline-flex;align-items:center;gap:8px;font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--edge);border-radius:var(--r-pill);padding:9px 16px;cursor:pointer;transition:border-color var(--ease)}
+.lmore:hover{border-color:var(--accent)}
+.serr .wfoot{margin-top:26px;align-items:center;border-top:0;padding-top:0}
+/* skeleton */
+.sk__line{display:inline-block;position:relative;width:var(--sk-w,100%);height:1.5em}
+.sk__line::before{content:"";position:absolute;left:0;right:0;top:50%;height:.62em;margin-top:-.31em;border-radius:.2em;background-color:var(--sk-fill);background-image:linear-gradient(100deg,transparent 30%,var(--sk-glint) 50%,transparent 70%);background-size:160vw 100%;background-repeat:no-repeat;background-attachment:fixed;animation:sk-sweep 3.6s linear infinite}
+@keyframes sk-sweep{from{background-position:0 0}to{background-position:160vw 0}}
+@media(prefers-reduced-motion:reduce){.sk__line::before{animation:none;background-image:none}}
+/* story card */
+.story-card{padding:26px 0;border-bottom:1px solid var(--edge)}
+.story-card__meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.story-card__meta .cat{color:var(--accent)}
+.story-card__meta .cat::before{content:"\25CF";font-size:8px;vertical-align:2px;margin-right:6px}
+.story-card__title{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.02em;line-height:1.14;margin-top:12px;text-wrap:balance}
+.story-card__excerpt{margin-top:10px;font-size:17px;line-height:1.7;color:var(--text);opacity:.86;text-wrap:pretty}
+.story-card__cta{margin-top:14px}
+.text-link{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.category-chip{display:inline-block;font-family:var(--body);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text);border:1px solid var(--edge);border-radius:var(--r-pill);padding:8px 15px;transition:border-color var(--ease),color var(--ease)}
+.category-chip:hover{border-color:var(--accent);color:var(--accent)}
+.nav-pill{display:inline-block;font-family:var(--body);font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:var(--r-pill);padding:8px 15px}
+/* building card */
+.pcard{display:flex;flex-direction:column;border:1px solid var(--edge);border-radius:var(--r-md);background:var(--surface);overflow:hidden;color:inherit}
+.pcard__media{position:relative;display:block;aspect-ratio:16/9;background:var(--edge);overflow:hidden}
+.pcard__ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14px;text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#a49b87;background:repeating-linear-gradient(45deg,#EDE8DC,#EDE8DC 7px,#F3EFE5 7px,#F3EFE5 14px)}
+.pcard__soon-badge{position:absolute;top:10px;right:10px;z-index:2;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-fg);background:rgba(22,20,14,.82);border-radius:var(--r-pill);padding:5px 11px}
+.pcard__body{display:flex;flex-direction:column;gap:6px;padding:14px;flex:1}
+.pcard__title{font-family:var(--display);font-weight:700;font-size:16px;line-height:1.24;letter-spacing:-.01em;color:var(--text)}
+.pcard__desc{font-family:var(--body);font-size:13px;line-height:1.5;color:var(--muted);text-wrap:pretty}
+.pcard__foot{margin-top:auto;padding-top:10px;font-size:12.5px;font-weight:600;color:var(--accent)}
+/* quote — sunk notebook */
+.quote{max-width:var(--quote-measure);margin:0 auto;padding:24px 30px 26px;border-radius:var(--r-md);background-color:var(--surface-sunk);background-image:linear-gradient(var(--qgrid) 1px,transparent 1px),linear-gradient(90deg,var(--qgrid) 1px,transparent 1px);background-size:22px 22px;font-size:21px;font-weight:500;line-height:1.4;color:var(--text);text-wrap:pretty}
+.quote cite{display:block;margin-top:14px;font-size:15px;font-weight:600;font-style:normal;color:var(--muted)}
+.quote cite::before{content:"\2014\00a0"}
+/* code block — stone, identical in both themes */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:var(--r-md);padding:20px 22px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.65;white-space:pre;max-width:var(--text-measure)}
+</style>
+</head><body>
+<div class="sg-wrap">
+
+<header class="sg-top">
+  <div>
+    <div class="sg-mark">
+      <svg viewBox="-150 -300 420 476" xmlns="http://www.w3.org/2000/svg" aria-label="awhitepen pen mark"><defs>
+        <linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E7CE86"></stop><stop offset="0.45" stop-color="#C9A24B"></stop><stop offset="1" stop-color="#A07D2C"></stop></linearGradient>
+        <linearGradient id="sp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EDEDF2"></stop><stop offset="1" stop-color="#A9AAB4"></stop></linearGradient></defs>
+        <g transform="rotate(38 60 176)">
+        <rect x="36" y="-244" width="48" height="210" rx="22" fill="#35618E"></rect>
+        <rect x="34" y="-66" width="52" height="16" rx="4" fill="url(#gp)" stroke="#A07D2C" stroke-width="0.8"></rect>
+        <ellipse cx="60" cy="-244" rx="24" ry="10" fill="#28496A"></ellipse>
+        <rect x="78" y="-232" width="6" height="120" rx="3" fill="url(#gp)"></rect>
+        <circle cx="81" cy="-110" r="4.5" fill="url(#gp)"></circle>
+        <rect x="30" y="-40" width="60" height="74" rx="16" fill="#28496A"></rect>
+        <rect x="27" y="18" width="66" height="18" rx="5" fill="#28496A"></rect>
+        <path fill="url(#gp)" stroke="#A07D2C" stroke-width="1.2" d="M22 44 C22 28 34 20 60 20 C86 20 98 28 98 44 C98 52 96 64 92 78 C84 108 73 140 63 168 L60 176 L57 168 C47 140 36 108 28 78 C24 64 22 52 22 44 Z"></path>
+        <path fill="none" stroke="#86671F" stroke-width="1.4" d="M26 46 C42 56 78 56 94 46"></path>
+        <circle cx="60" cy="92" r="11" fill="none" stroke="#9A7A2C" stroke-width="1" opacity="0.75"></circle>
+        <circle cx="60" cy="118" r="6" fill="#141310"></circle>
+        <path d="M60 124 L60 170" stroke="#141310" stroke-width="2.4" stroke-linecap="round"></path>
+        <path fill="url(#sp)" stroke="#8A8B95" stroke-width="0.8" d="M49 150 C53 162 57 170 60 176 C63 170 67 162 71 150 C67 156 53 156 49 150 Z"></path>
+        <path d="M60 152 L60 175" stroke="#141310" stroke-width="1.6" stroke-linecap="round"></path>
+        </g></svg>
+      <div>
+        <p class="sg-eyebrow">awhitepen · signature style</p>
+        <h1 class="sg-h1">The look, in one file</h1>
+      </div>
+    </div>
+    <p class="sg-lede">Everything a build needs to look and read like awhitepen: the two-palette token set, the type system, the components, and the rules that hold them together. Self-contained — drop it into any repo and open it. The values shown are the live build's values.</p>
+  </div>
+  <button class="theme-toggle" type="button" aria-pressed="false"><span data-tt-label>Dark</span></button>
+</header>
+
+<!-- HOW TO USE -->
+<section class="sg-sec">
+  <p class="sg-sec__k">Start here</p>
+  <h2 class="sg-sec__h">How to reuse this</h2>
+  <p class="sg-sec__d">Copy the <code>:root</code> / <code>[data-theme="dark"]</code> block and the font <code>&lt;link&gt;</code> from the top of this file's source. Read §Colour–§Space for what each token is for, lift the component CSS at the bottom of the &lt;style&gt; block as-is, and keep the four laws. Which hue means which data category is a per-site choice — it is not baked into the palette.</p>
+  <ul class="sg-law">
+    <li>A value that has a token is never written as a literal.</li>
+    <li>Every colour is declared in both themes.</li>
+    <li>A style that is the same on every render is a class, not an inline style.</li>
+    <li>Large fill → dusty <code>--d-*</code>; small mark → vivid <code>--c-*</code>.</li>
+  </ul>
+</section>
+
+<!-- COLOUR -->
+<section class="sg-sec">
+  <p class="sg-sec__k">01 · Colour</p>
+  <h2 class="sg-sec__h">Two palettes, one set of names</h2>
+  <p class="sg-sec__d"><code>:root</code> is light; <code>[data-theme="dark"]</code> on <code>&lt;html&gt;</code> overrides it. No component branches on the theme — only the token values change. Toggle the switch above to see every swatch flip. <code>prefers-color-scheme</code> seeds the first visit only; the reader owns the toggle after that.</p>
+
+  <p class="sg-sub">Chrome — the structure of a page</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--bg)"></div><div class="sw__m"><p class="sw__n">--bg</p><p class="sw__v">#F4F2EC / #262320</p><p class="sw__u">page</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--surface)"></div><div class="sw__m"><p class="sw__n">--surface</p><p class="sw__v">#FFFFFF / #302C26</p><p class="sw__u">cards, tables, raised panels</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--surface-alt)"></div><div class="sw__m"><p class="sw__n">--surface-alt</p><p class="sw__v">#FAF7F0 / #363021</p><p class="sw__u">tracks, inner placeholders</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--text)"></div><div class="sw__m"><p class="sw__n">--text</p><p class="sw__v">#201D16 / #EFEAE0</p><p class="sw__u">headings, UI text</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--muted)"></div><div class="sw__m"><p class="sw__n">--muted</p><p class="sw__v">#857E70 / #ABA08D</p><p class="sw__u">meta, deks, secondary</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--soft)"></div><div class="sw__m"><p class="sw__n">--soft</p><p class="sw__v">#6F695E / #C4BAA9</p><p class="sw__u">secondary line under a readout</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--edge)"></div><div class="sw__m"><p class="sw__n">--edge</p><p class="sw__v">#E5E0D5 / #3B362D</p><p class="sw__u">hairlines, card borders</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--edge-strong)"></div><div class="sw__m"><p class="sw__n">--edge-strong</p><p class="sw__v">#201D16 / #6E6656</p><p class="sw__u">table header rule, totals</p></div></div>
+  </div>
+
+  <p class="sg-sub">Ink — header &amp; footer, dark in both themes</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--ink)"></div><div class="sw__m"><p class="sw__n">--ink</p><p class="sw__v">#16140E / #1C1A15</p><p class="sw__u">chrome ground</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--ink-fg)"></div><div class="sw__m"><p class="sw__n">--ink-fg</p><p class="sw__v">#F3EFE6</p><p class="sw__u">text on ink</p></div></div>
+  </div>
+
+  <p class="sg-sub">Accent — one blue, five roles</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--accent)"></div><div class="sw__m"><p class="sw__n">--accent</p><p class="sw__v">#35618E / #82A9D0</p><p class="sw__u">links, fills, primary series</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--accent-dk)"></div><div class="sw__m"><p class="sw__n">--accent-dk</p><p class="sw__v">#28496A / #9CBBDD</p><p class="sw__u">hover, deeper fill</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--accent-ink)"></div><div class="sw__m"><p class="sw__n">--accent-ink</p><p class="sw__v">#3C6A97 / #82A9D0</p><p class="sw__u">focus ring</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--accent-soft)"></div><div class="sw__m"><p class="sw__n">--accent-soft</p><p class="sw__v">blue @10% / @16%</p><p class="sw__u">target bands</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--accent-out)"></div><div class="sw__m"><p class="sw__n">--accent-out</p><p class="sw__v">blue @30% / @40%</p><p class="sw__u">outlines on fills</p></div></div>
+  </div>
+
+  <p class="sg-sub">Dusty <code>--d-*</code> — identity &amp; state (large fills, never a series)</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--d-red)"></div><div class="sw__m"><p class="sw__n">--d-red</p><p class="sw__v">#B9695E / #CE8478</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-gold)"></div><div class="sw__m"><p class="sw__n">--d-gold</p><p class="sw__v">#BC9152 / #D3A768</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-teal)"></div><div class="sw__m"><p class="sw__n">--d-teal</p><p class="sw__v">#5E93A1 / #7BAEBD</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-green)"></div><div class="sw__m"><p class="sw__n">--d-green</p><p class="sw__v">#5D9375 / #79B292</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-plum)"></div><div class="sw__m"><p class="sw__n">--d-plum</p><p class="sw__v">#8571A8 / #A48CC4</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-blue)"></div><div class="sw__m"><p class="sw__n">--d-blue</p><p class="sw__v">#6E869E / #8DA3BD</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--d-grey)"></div><div class="sw__m"><p class="sw__n">--d-grey</p><p class="sw__v">#8C8A87 / #A8A6A2</p><p class="sw__u">chart neutral, "out" / not-logged</p></div></div>
+  </div>
+
+  <p class="sg-sub">Vivid <code>--c-*</code> — series &amp; small marks (a dot, a thin bar, a donut segment)</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--c-red)"></div><div class="sw__m"><p class="sw__n">--c-red</p><p class="sw__v">#E04A3A / #F0604E</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-gold)"></div><div class="sw__m"><p class="sw__n">--c-gold</p><p class="sw__v">#E0991C / #E9AE3E</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-teal)"></div><div class="sw__m"><p class="sw__n">--c-teal</p><p class="sw__v">#2BA8C0 / #46BBD0</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-green)"></div><div class="sw__m"><p class="sw__n">--c-green</p><p class="sw__v">#23A35E / #3FB873</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-plum)"></div><div class="sw__m"><p class="sw__n">--c-plum</p><p class="sw__v">#8E5BC0 / #A877D6</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-tan)"></div><div class="sw__m"><p class="sw__n">--c-tan</p><p class="sw__v">#B79A6B / #CBB07E</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-blue)"></div><div class="sw__m"><p class="sw__n">--c-blue</p><p class="sw__v">#5E7A99 / #86A2C0</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-orange)"></div><div class="sw__m"><p class="sw__n">--c-orange</p><p class="sw__v">#DE6F00 / #F48D2F</p></div></div>
+  </div>
+
+  <p class="sg-sub">Semantic — state, not decoration</p>
+  <div class="sg-grid">
+    <div class="sw"><div class="sw__c" style="background:var(--good)"></div><div class="sw__m"><p class="sw__n">--good</p><p class="sw__v">#1F9A86 / #3FB873</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--alert)"></div><div class="sw__m"><p class="sw__n">--alert</p><p class="sw__v">#D23B2C / #E2645A</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--code-bg)"></div><div class="sw__m"><p class="sw__n">--code-bg</p><p class="sw__v">#5A554C (both)</p><p class="sw__u">code panel, theme-flat</p></div></div>
+    <div class="sw"><div class="sw__c" style="background:var(--c-gridline)"></div><div class="sw__m"><p class="sw__n">--c-gridline</p><p class="sw__v">#EBE5D9 / white @12%</p><p class="sw__u">hairline; never carries meaning</p></div></div>
+  </div>
+</section>
+
+<!-- TYPE -->
+<section class="sg-sec">
+  <p class="sg-sec__k">02 · Type</p>
+  <h2 class="sg-sec__h">Three families, one job each</h2>
+  <p class="sg-sec__d"><b>Schibsted Grotesk</b> (<code>--display</code>) for headlines, titles and hero figures · <b>Figtree</b> (<code>--body</code>) for prose, labels, UI and numbers in rows · <b>IBM Plex Mono</b> (<code>--mono</code>) for dates, category meta and code. Mixing the jobs is the fastest way to stop looking like this site.</p>
+
+  <p class="sg-sub">Site scale</p>
+  <div>
+    <div class="ty-spec"><span class="ty-title">A quiet place to think out loud</span><small>--fs-page-title · display 700 · 48 / 1.02 / -.03em</small></div>
+    <div class="ty-spec"><span class="ty-h2">Section heading</span><small>--fs-h2 · display 700 · 30 / -.02em</small></div>
+    <div class="ty-spec"><span class="ty-card">A story card title, two lines at most</span><small>--fs-card-title · display 700 · 26 / 1.14 / -.02em</small></div>
+    <div class="ty-spec"><span class="ty-lede">The lede sets up the piece in a sentence or two.</span><small>--fs-lede · Figtree 500 · 22 / 1.55</small></div>
+    <div class="ty-spec"><span class="ty-body">Body copy runs at nineteen on a 740px measure, the setting posts are read at. Long-form is where the site spends its attention, so the line length and rhythm are tuned for a screenful of prose, not a headline.</span><small>--fs-entry · Figtree 400 · 19 / 1.65 · --text-body</small></div>
+    <div class="ty-spec"><span class="ty-meta">Sep 14, 2026 · Health</span><small>--fs-meta · mono · 11 / .06em caps</small></div>
+    <div class="ty-spec"><span class="ty-eyebrow">Eyebrow kicker</span><small>--fs-eyebrow · Figtree 600 · 12 / .18em caps · accent</small></div>
+  </div>
+
+  <p class="sg-sub">Dashboard tiers — display 700 for figures, body for the rest, no mono</p>
+  <table class="sg-tbl"><thead><tr><th>Tier</th><th>Setting</th><th>Example</th></tr></thead><tbody>
+    <tr><td class="tok">Card key</td><td>700 · 10.5 · .18em caps · muted</td><td>BODY WEIGHT</td></tr>
+    <tr><td class="tok">Readout XL</td><td>display 700 · clamp(38,6vw,56) · -.03em</td><td>S$1,705.34</td></tr>
+    <tr><td class="tok">Readout L</td><td>display 700 · 30 · -.03em</td><td>1,180 kcal</td></tr>
+    <tr><td class="tok">Readout M</td><td>display 700 · 21 · -.025em</td><td>19h 36m</td></tr>
+    <tr><td class="tok">Row text</td><td>400/600 · 13.5 · tabular</td><td>Protein 74 g</td></tr>
+    <tr><td class="tok">Legend</td><td>11.5 · muted · lowercase</td><td>7-day average</td></tr>
+    <tr><td class="tok">Panel footer</td><td>600 · 11 · .06em</td><td>All times in Bangkok (GMT+7)</td></tr>
+  </tbody></table>
+  <p class="sg-note">Floor: 12px for anything a reader must read. 10–11.5 is for keys, ticks, legends and footers only. Rows and tables use tabular-nums; hero figures use proportional.</p>
+</section>
+
+<!-- SPACE -->
+<section class="sg-sec">
+  <p class="sg-sec__k">03 · Space &amp; shape</p>
+  <h2 class="sg-sec__h">One scale, four radii, named widths</h2>
+  <p class="sg-sub">Spacing — --s1 … --s9</p>
+  <div>
+    <div class="sp-row"><span class="sp-bar" style="width:4px"></span>--s1 · 4</div>
+    <div class="sp-row"><span class="sp-bar" style="width:8px"></span>--s2 · 8</div>
+    <div class="sp-row"><span class="sp-bar" style="width:12px"></span>--s3 · 12</div>
+    <div class="sp-row"><span class="sp-bar" style="width:16px"></span>--s4 · 16</div>
+    <div class="sp-row"><span class="sp-bar" style="width:24px"></span>--s5 · 24</div>
+    <div class="sp-row"><span class="sp-bar" style="width:32px"></span>--s6 · 32</div>
+    <div class="sp-row"><span class="sp-bar" style="width:48px"></span>--s7 · 48</div>
+    <div class="sp-row"><span class="sp-bar" style="width:64px"></span>--s8 · 64</div>
+    <div class="sp-row"><span class="sp-bar" style="width:96px"></span>--s9 · 96</div>
+  </div>
+
+  <p class="sg-sub">Radii</p>
+  <div class="sg-row" style="gap:28px">
+    <div class="rad"><i style="border-radius:8px"></i><b>--r-sm · 8</b></div>
+    <div class="rad"><i style="border-radius:12px"></i><b>--r-md · 12</b></div>
+    <div class="rad"><i style="border-radius:16px"></i><b>--r-lg · 16</b></div>
+    <div class="rad"><i style="border-radius:999px"></i><b>--r-pill · 999</b></div>
+  </div>
+
+  <p class="sg-sub">Layout widths &amp; more</p>
+  <table class="sg-tbl"><tbody>
+    <tr><td class="tok">--text-measure</td><td>740px — the text column</td></tr>
+    <tr><td class="tok">--measure</td><td>828px — reading shell (text + 2×--gutter)</td></tr>
+    <tr><td class="tok">--quote-measure</td><td>620px — pull quotes</td></tr>
+    <tr><td class="tok">--wide</td><td>1120px — header, footer, portfolio, dashboards</td></tr>
+    <tr><td class="tok">--gutter / --header-h</td><td>44px shell padding / 78px header</td></tr>
+    <tr><td class="tok">--ease</td><td>.16s ease — everything that moves</td></tr>
+    <tr><td class="tok">--shadow-hover / -menu / -tip</td><td>hover lifts &amp; floating surfaces only</td></tr>
+  </tbody></table>
+  <p class="sg-note">Dividers are load-bearing: 1px dotted --rule inside a card (sub-groups, legends, footers); 1px solid --edge for structure (card borders, section boundaries).</p>
+</section>
+
+<!-- COMPONENTS -->
+<section class="sg-sec">
+  <p class="sg-sec__k">04 · Components</p>
+  <h2 class="sg-sec__h">The parts, rendered</h2>
+  <p class="sg-sec__d">Live from the component CSS at the bottom of this file's &lt;style&gt; (verbatim from <code>css/base.css</code> + <code>build/status.css</code>). Anatomy and rules are in the labels.</p>
+
+  <div class="sg-cards" style="margin-top:24px">
+    <!-- data card -->
+    <div class="card">
+      <div class="whead"><div><div class="whead__k">Body weight</div><div class="whead__l">55.6 kg this morning</div></div><div class="whead__note">6m after waking</div></div>
+      <p class="readout">55.4<small>kg 7-day avg</small></p>
+      <div class="legend"><span class="legend__i"><span class="legend__sw legend__sw--dot legend__sw--weight"></span>weight</span><span class="legend__i"><span class="legend__sw legend__sw--line legend__sw--avg"></span>7-day average</span></div>
+      <div class="wfoot"><span>All times in Bangkok (GMT+7)</span><span>15-minute delay by design</span></div>
+    </div>
+    <!-- key-only + hero -->
+    <div class="card">
+      <div class="whead"><div><div class="whead__k">Spent today</div></div></div>
+      <p class="hero-amt">S$79.92</p>
+      <p class="sg-note">Data cards open with the key; the title is optional. One Readout XL per view.</p>
+    </div>
+    <!-- failure -->
+    <div class="card">
+      <p class="serr__k"><i class="serr__dot serr__dot--rate"></i>Resources · 429</p>
+      <h2 class="serr__h">Too many requests, too quickly.</h2>
+      <p class="serr__p"><b>That's my speed limit, not a fault.</b> The server wants a short breather before it answers again.</p>
+      <div class="wfoot"><button class="lmore" type="button" aria-disabled="true">Try again shortly</button><span>Tried at 11:53 AM</span></div>
+    </div>
+  </div>
+
+  <p class="sg-sub">Chips — state (lowercase) &amp; the segmented control</p>
+  <div class="sg-row">
+    <span class="tchip tchip--in">in range</span>
+    <span class="tchip tchip--done">completed</span>
+    <span class="tchip tchip--togo">14 g to go</span>
+    <span class="tchip tchip--over">over by 40</span>
+    <span class="tchip tchip--none">skipped</span>
+    <span class="brng"><button type="button" aria-pressed="true">7D</button><button type="button">30D</button><button type="button">3M</button><button type="button">6M</button></span>
+  </div>
+
+  <p class="sg-sub">Stepper — label fixed at --stepper-label-w so the arrows never move</p>
+  <span class="bpan"><button type="button" aria-label="Earlier"><svg viewBox="0 0 24 24"><path d="M15 5 8 12 15 19"></path></svg></button><span class="bpan__lab">27 Aug – 25 Sept</span><button type="button" aria-label="Later"><svg viewBox="0 0 24 24"><path d="M9 5 16 12 9 19"></path></svg></button></span>
+
+  <p class="sg-sub">Legend swatches — the swatch must resolve to the same token as the mark</p>
+  <div class="legend" style="border:0;padding:0;margin:0">
+    <span class="legend__i"><span class="legend__sw legend__sw--in"></span>in trays</span>
+    <span class="legend__i"><span class="legend__sw legend__sw--out"></span>out</span>
+    <span class="legend__i"><span class="legend__sw legend__sw--fasting"></span>fasting</span>
+    <span class="legend__i"><span class="legend__sw legend__sw--dotline" style="color:var(--muted)"></span>no weigh-in</span>
+    <span class="legend__i"><span class="legend__sw legend__sw--unlogged"></span>not logged</span>
+  </div>
+
+  <p class="sg-sub">Skeleton — occupies the height its content will, so nothing jumps</p>
+  <div class="card" style="max-width:360px"><div class="whead"><div><div class="whead__k">Loading</div></div></div><b class="sk__line" style="--sk-w:70%"></b><div style="height:10px"></div><b class="sk__line" style="--sk-w:45%"></b></div>
+
+  <p class="sg-sub">Buttons &amp; chips — actions in sentence case</p>
+  <div class="sg-row"><a class="text-link" href="#">Read more →</a><span class="category-chip">Musings</span><span class="category-chip is-active" style="background:var(--accent);color:#fff;border-color:var(--accent)">Health</span><span class="nav-pill">Blog</span><button class="lmore" type="button">Continue</button></div>
+
+  <p class="sg-sub">Story card — the blog stream item</p>
+  <article class="story-card">
+    <p class="story-card__meta"><span>Sep 14, 2026</span><span class="cat">Health</span><span class="cat">Life</span></p>
+    <h3 class="story-card__title">What ten days of silence actually did</h3>
+    <p class="story-card__excerpt">A cluttered mind gets slower. This is the reset, and what it cost to get there.</p>
+    <p class="story-card__cta"><a class="text-link" href="#">Read more →</a></p>
+  </article>
+
+  <p class="sg-sub">Building card — media over name · sentence · destination, with two empty states</p>
+  <div class="sg-cards">
+    <div class="pcard"><span class="pcard__media"><span class="pcard__ph">project shot · 16:9</span></span><div class="pcard__body"><p class="pcard__title">HeyMax</p><p class="pcard__desc">First data hire; built the analytics from nothing.</p><p class="pcard__foot">heymax.ai →</p></div></div>
+    <div class="pcard"><span class="pcard__media"><span class="pcard__soon-badge">Coming soon</span><span class="pcard__ph">meditation hall</span></span><div class="pcard__body"><p class="pcard__title">Plum Village</p><p class="pcard__desc">Ten days, no phone. Notes pending.</p></div></div>
+  </div>
+
+  <p class="sg-sub">Quote — the sunk-notebook frame (620px, 4% sunk tint, 22px grid)</p>
+  <blockquote class="quote">If there was the option of meditating in your room or in the hall, you bet B chose the room.<cite>Vipassana, day four</cite></blockquote>
+
+  <p class="sg-sub">Code — Stone, #5A554C in both themes</p>
+  <pre class="code">Now create a favicon asset package for the site,
+covering every size a modern browser asks for.</pre>
+</section>
+
+<!-- IDENTITY -->
+<section class="sg-sec">
+  <p class="sg-sec__k">05 · Identity</p>
+  <h2 class="sg-sec__h">The notebook motif</h2>
+  <p class="sg-sec__d">A faint graph-paper texture (<code>--grid</code>, 26px) sits in the lower-right of every page — you can see it behind this one — and the same idea, tighter at 22px (<code>--qgrid</code>), lines the quote box. With the pen mark it is the notebook the site is named for. Optional on a sister site, but it is the thing people recognise.</p>
+</section>
+
+<!-- RULES -->
+<section class="sg-sec">
+  <p class="sg-sec__k">06 · Rules that keep it coherent</p>
+  <h2 class="sg-sec__h">Conventions &amp; breakpoints</h2>
+  <p class="sg-sec__d"><b>BEM</b> — <code>block__element--modifier</code>, one block per component. <b>Tokens, not literals</b> — three exceptions only: media-query conditions (custom properties are not allowed there), editor swatch hexes (attribute selectors must match literal text), and deliberately theme-flat colours (which point at a flat token). <b>No static inline styles</b> — inline is only for values that come from data, like a bar width or a series colour. <b>Responsive: components adapt, they do not shrink</b> — a table becomes rows, a row becomes a stack; nothing scales down until it is unreadable.</p>
+  <table class="sg-tbl"><thead><tr><th>max-width</th><th>What changes</th></tr></thead><tbody>
+    <tr><td class="tok">1024</td><td>header search hides</td></tr>
+    <tr><td class="tok">860</td><td>header collapses to the menu button; footer embed grid stacks</td></tr>
+    <tr><td class="tok">640</td><td>the phone break — search, rows, post chrome</td></tr>
+    <tr><td class="tok">600</td><td>dashboard tabs wrap; TODAY's sheet goes single column</td></tr>
+    <tr><td class="tok">520</td><td>year and panel grids stack</td></tr>
+    <tr><td class="tok">480</td><td>split readouts stack</td></tr>
+  </tbody></table>
+  <p class="sg-note">Reuse these six. Four one-offs (900/820/760/440) and two off-by-one partners (859/599) exist in the build for single components — add a seventh only when a component genuinely breaks somewhere else.</p>
+</section>
+
+<!-- STARTER -->
+<section class="sg-sec">
+  <p class="sg-sec__k">07 · Starter</p>
+  <h2 class="sg-sec__h">Copy this and go</h2>
+  <p class="sg-sec__d">The full token block lives at the top of this file's <code>&lt;style&gt;</code> — copy it there (it is easier to lift with real formatting than from a rendered code box). Add the fonts:</p>
+  <pre class="sg-code">&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;
+&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;
+&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&amp;family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap"&gt;</pre>
+  <p class="sg-note">Token count: 77 light, 46 dark — every colour declared in both. awhitepen.com is the reference implementation; its dashboards' hue→category assignments are documented separately (they are a per-site choice, not part of the palette).</p>
+</section>
+
+</div>
+<script>
+(function(){
+  var root=document.documentElement,btn=document.querySelector('.theme-toggle'),lab=btn.querySelector('[data-tt-label]'),KEY='awp-style-theme';
+  function apply(t){root.setAttribute('data-theme',t);lab.textContent=t==='dark'?'Light':'Dark';btn.setAttribute('aria-pressed',String(t==='dark'));}
+  var saved=null;try{saved=localStorage.getItem(KEY);}catch(e){}
+  apply(saved||(window.matchMedia&&matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+  btn.addEventListener('click',function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';apply(t);try{localStorage.setItem(KEY,t);}catch(e){}});
+})();
+</script>
+</body></html>

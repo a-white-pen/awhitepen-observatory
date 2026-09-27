@@ -2,173 +2,113 @@
 /**
  * Status page template.
  *
+ * TODAY, BODY, FUEL and RESOURCES are each rendered by their own script from the
+ * status API; MIND shows an under-construction card until it is built. Every
+ * live panel ships with a skeleton already in it, which its script clears once
+ * the first render lands.
+ *
  * @package AWhitePen
  */
 
 get_header();
 
-$status_dashboards = array(
+/*
+ * Tabs are rendered here so their labels remain translatable. `live` marks a
+ * panel filled by its dashboard script; the rest show the under-construction card.
+ */
+$status_tabs = array(
 	array(
-		'slug'        => 'today',
-		'label'       => __( 'TODAY', 'awhitepen' ),
-		'description' => array( __( 'now', 'awhitepen' ), __( 'current', 'awhitepen' ) ),
-		'accent'      => '#2F1608',
+		'live'  => true,
+		'slug'  => 'today',
+		'label' => __( 'TODAY', 'awhitepen' ),
+		'desc'  => __( 'now · current', 'awhitepen' ),
 	),
 	array(
-		'slug'        => 'mind',
-		'label'       => __( 'MIND', 'awhitepen' ),
-		'description' => array( __( 'focus', 'awhitepen' ), __( 'attention', 'awhitepen' ), __( 'sleep', 'awhitepen' ) ),
-		'accent'      => '#5B57C8',
+		'slug'  => 'mind',
+		'label' => __( 'MIND', 'awhitepen' ),
+		'desc'  => __( 'focus · attention · sleep', 'awhitepen' ),
 	),
 	array(
-		'slug'        => 'body',
-		'label'       => __( 'BODY', 'awhitepen' ),
-		'description' => array( __( 'weight', 'awhitepen' ), __( 'move', 'awhitepen' ), __( 'teeth', 'awhitepen' ) ),
-		'accent'      => '#B14C66',
+		'live'  => true,
+		'slug'  => 'body',
+		'label' => __( 'BODY', 'awhitepen' ),
+		'desc'  => __( 'weight · invisalign · vitals', 'awhitepen' ),
 	),
 	array(
-		'slug'        => 'fuel',
-		'label'       => __( 'FUEL', 'awhitepen' ),
-		'description' => array( __( 'food', 'awhitepen' ), __( 'macros', 'awhitepen' ), __( 'meals', 'awhitepen' ) ),
-		'accent'      => '#C35A1E',
+		'live'   => true,
+		'slug'  => 'fuel',
+		'label' => __( 'FUEL', 'awhitepen' ),
+		'desc'  => __( 'food · macros · meals', 'awhitepen' ),
 	),
 	array(
-		'slug'        => 'resources',
-		'label'       => __( 'RESOURCES', 'awhitepen' ),
-		'description' => array( __( 'money', 'awhitepen' ), __( 'spend', 'awhitepen' ) ),
-		'accent'      => '#0D7A8C',
+		'live'   => true,
+		'slug'  => 'resources',
+		'label' => __( 'RESOURCES', 'awhitepen' ),
+		'desc'  => __( 'money · spend', 'awhitepen' ),
 	),
 );
 
-$default_status_dashboard = 'today';
-
-// Status tabs whose panel mounts an inline widget (assets/status/widgets/<slug>.js,
-// registered as window.AWP_WIDGETS[<slug>]). Others render the "coming soon" placeholder.
-$status_widgets = array(
-	'today'     => true,
-	'fuel'      => true,
-	'body'      => true,
-	'resources' => true,
-);
+$default_tab = 'today';
 ?>
 
-<main id="primary" class="site-main site-main--status">
-	<div class="site-shell">
+<main class="site-main status" id="primary">
+	<div class="wrap">
 		<?php
 		while ( have_posts() ) :
 			the_post();
 			?>
-			<article id="post-<?php the_ID(); ?>" <?php post_class( 'page-entry page-entry--status' ); ?>>
-				<header class="content-column entry-hero entry-hero--page">
-					<p class="section-kicker"><?php esc_html_e( 'Status', 'awhitepen' ); ?></p>
-					<h1 class="entry-title"><?php the_title(); ?></h1>
-				</header>
-
-				<div class="status-dashboard" data-status-dashboard data-default-tab="<?php echo esc_attr( $default_status_dashboard ); ?>">
-					<div class="status-dashboard-nav-shell">
-						<nav class="status-dashboard-nav" aria-label="<?php esc_attr_e( 'Status dashboards', 'awhitepen' ); ?>">
-							<div class="status-dashboard-nav__scroll" role="tablist">
-								<?php foreach ( $status_dashboards as $dashboard ) : ?>
-									<?php $is_active = $default_status_dashboard === $dashboard['slug']; ?>
-									<a
-										id="status-tab-<?php echo esc_attr( $dashboard['slug'] ); ?>"
-										class="status-dashboard-tab status-dashboard-tab--<?php echo esc_attr( $dashboard['slug'] ); ?><?php echo $is_active ? ' is-active' : ''; ?>"
-										href="#<?php echo esc_attr( $dashboard['slug'] ); ?>"
-										role="tab"
-										aria-selected="<?php echo $is_active ? 'true' : 'false'; ?>"
-										aria-controls="<?php echo esc_attr( $dashboard['slug'] ); ?>"
-										data-status-tab="<?php echo esc_attr( $dashboard['slug'] ); ?>"
-										style="--status-tab-accent: <?php echo esc_attr( $dashboard['accent'] ); ?>;"
-									>
-										<span class="status-dashboard-tab__label"><?php echo esc_html( $dashboard['label'] ); ?></span>
-										<span class="status-dashboard-tab__description">
-											<?php foreach ( $dashboard['description'] as $index => $description ) : ?>
-												<?php if ( 0 < $index ) : ?>
-													<span class="status-dashboard-tab__dot" aria-hidden="true">&bull;</span>
-												<?php endif; ?>
-												<span><?php echo esc_html( $description ); ?></span>
-											<?php endforeach; ?>
-										</span>
-									</a>
-								<?php endforeach; ?>
-							</div>
-						</nav>
-					</div>
-
-					<?php foreach ( $status_dashboards as $dashboard ) : ?>
-						<?php $is_active = $default_status_dashboard === $dashboard['slug']; ?>
-						<section
-							id="<?php echo esc_attr( $dashboard['slug'] ); ?>"
-							class="status-dashboard-panel status-dashboard-panel--<?php echo esc_attr( $dashboard['slug'] ); ?><?php echo $is_active ? ' is-active' : ''; ?>"
-							role="tabpanel"
-							aria-labelledby="status-tab-<?php echo esc_attr( $dashboard['slug'] ); ?>"
-							data-status-panel="<?php echo esc_attr( $dashboard['slug'] ); ?>"
-							<?php echo $is_active ? '' : 'hidden'; ?>
-						>
-							<?php if ( isset( $status_widgets[ $dashboard['slug'] ] ) ) : ?>
-								<div class="status-widget-mount" data-status-widget="<?php echo esc_attr( $dashboard['slug'] ); ?>"></div>
-							<?php else : ?>
-								<div class="status-dashboard-placeholder" style="--status-tab-accent: <?php echo esc_attr( $dashboard['accent'] ); ?>;">
-									<p class="status-dashboard-placeholder__eyebrow"><?php echo esc_html( $dashboard['label'] ); ?></p>
-									<h2 class="status-dashboard-placeholder__title"><?php esc_html_e( 'Coming Soon', 'awhitepen' ); ?></h2>
-									<p class="status-dashboard-placeholder__text">
-										<?php
-										printf(
-											/* translators: %s: status dashboard label. */
-											esc_html__( '%s dashboard is getting its own view.', 'awhitepen' ),
-											esc_html( strtolower( $dashboard['label'] ) )
-										);
-										?>
-									</p>
-								</div>
-							<?php endif; ?>
-						</section>
-					<?php endforeach; ?>
+			<header class="phead">
+				<div>
+					<p class="phead__eyebrow"><?php esc_html_e( 'B’s system status', 'awhitepen' ); ?></p>
+					<h1 class="phead__title"><?php the_title(); ?></h1>
 				</div>
-					<?php
-					// Inline widget assets: shared React + per-widget mount JS + widget CSS + widget fonts.
-					$status_widget_dir     = '/assets/status/widgets/';
-					$status_widget_scripts = array( 'react.js', 'react-dom.js', 'body.js', 'fuel.js', 'resources.js', 'today.js' );
-					$status_widget_styles  = array( 'resources.css', 'widgets-v2.css' );
-					?>
-					<link rel="preconnect" href="https://fonts.googleapis.com">
-					<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-					<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
-					<?php foreach ( $status_widget_styles as $status_widget_style ) : ?>
-					<link rel="stylesheet" href="<?php echo esc_url( add_query_arg( 'ver', awhitepen_asset_version( $status_widget_dir . $status_widget_style ), AWHITEPEN_URI . $status_widget_dir . $status_widget_style ) ); ?>">
-					<?php endforeach; ?>
-					<?php foreach ( $status_widget_scripts as $status_widget_script ) : ?>
-					<script src="<?php echo esc_url( add_query_arg( 'ver', awhitepen_asset_version( $status_widget_dir . $status_widget_script ), AWHITEPEN_URI . $status_widget_dir . $status_widget_script ) ); ?>"></script>
-					<?php endforeach; ?>
-					<script>
-						(function () {
-							var mounted = {};
-							function mount(slug) {
-								if (!slug || mounted[slug]) { return; }
-								var el = document.querySelector('.status-widget-mount[data-status-widget="' + slug + '"]');
-								var fn = window.AWP_WIDGETS && window.AWP_WIDGETS[slug];
-								if (el && fn) {
-									try { fn(el); mounted[slug] = true; } catch (e) { if (window.console) { console.error('widget mount failed:', slug, e); } }
-								}
-							}
-							function activeSlug() {
-								var t = document.querySelector('.status-dashboard-tab.is-active');
-								return t ? t.getAttribute('data-status-tab') : null;
-							}
-							function mountActive() { mount(activeSlug()); }
-							if (document.readyState === 'loading') {
-								document.addEventListener('DOMContentLoaded', mountActive);
-							} else {
-								mountActive();
-							}
-							document.addEventListener('click', function (e) {
-								var tab = e.target.closest && e.target.closest('[data-status-tab]');
-								if (tab) { setTimeout(function () { mount(tab.getAttribute('data-status-tab')); }, 0); }
-							});
-							window.addEventListener('hashchange', function () { setTimeout(mountActive, 0); });
-						})();
-					</script>
-			</article>
+			</header>
+
+			<nav class="tabs" aria-label="<?php esc_attr_e( 'Status dashboards', 'awhitepen' ); ?>" role="tablist">
+				<?php foreach ( $status_tabs as $tab ) : ?>
+					<?php $is_current = $default_tab === $tab['slug']; ?>
+					<button
+						type="button"
+						class="tab<?php echo $is_current ? ' on' : ''; ?>"
+						id="tab-<?php echo esc_attr( $tab['slug'] ); ?>"
+						role="tab"
+						aria-selected="<?php echo $is_current ? 'true' : 'false'; ?>"
+						aria-controls="panel-<?php echo esc_attr( $tab['slug'] ); ?>"
+						data-tab="<?php echo esc_attr( $tab['slug'] ); ?>"
+					><b><?php echo esc_html( $tab['label'] ); ?></b><span><?php echo esc_html( $tab['desc'] ); ?></span></button>
+				<?php endforeach; ?>
+			</nav>
+
+			<?php foreach ( $status_tabs as $tab ) : ?>
+				<?php $is_current = $default_tab === $tab['slug']; ?>
+				<section
+					class="panel<?php echo empty( $tab['live'] ) ? '' : ' sk'; ?>"
+					<?php echo empty( $tab['live'] ) ? '' : 'aria-busy="true"'; ?>
+					id="panel-<?php echo esc_attr( $tab['slug'] ); ?>"
+					role="tabpanel"
+					aria-labelledby="tab-<?php echo esc_attr( $tab['slug'] ); ?>"
+					data-panel="<?php echo esc_attr( $tab['slug'] ); ?>"
+					<?php echo $is_current ? '' : 'hidden'; ?>
+				>
+					<?php if ( ! empty( $tab['live'] ) ) : ?>
+						<?php get_template_part( 'template-parts/skeleton', $tab['slug'] ); ?>
+						<noscript>
+							<div class="card">
+								<p class="tcl__n--q"><?php esc_html_e( 'This dashboard needs JavaScript to read the live numbers.', 'awhitepen' ); ?></p>
+							</div>
+						</noscript>
+					<?php else : ?>
+						<div class="wip">
+							<span class="wip__tape"></span>
+							<div class="wip__in">
+								<p class="wip__k"><?php esc_html_e( 'Under construction', 'awhitepen' ); ?></p>
+								<h2 class="wip__h"><?php esc_html_e( 'Coming soon', 'awhitepen' ); ?></h2>
+							</div>
+							<span class="wip__tape"></span>
+						</div>
+					<?php endif; ?>
+				</section>
+			<?php endforeach; ?>
 		<?php endwhile; ?>
 	</div>
 </main>

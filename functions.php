@@ -17,6 +17,14 @@ if ( ! defined( 'AWHITEPEN_URI' ) ) {
 	define( 'AWHITEPEN_URI', get_template_directory_uri() );
 }
 
+/**
+ * Google Fonts for the design: Schibsted Grotesk for display, Figtree for body
+ * (with italics), Plex Mono for dates and code. Used by the site and the editor.
+ */
+function awhitepen_google_fonts_url() {
+	return 'https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700;800&family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500&display=swap';
+}
+
 function awhitepen_setup() {
 	load_theme_textdomain( 'awhitepen', AWHITEPEN_PATH . '/languages' );
 
@@ -25,8 +33,6 @@ function awhitepen_setup() {
 	add_theme_support(
 		'html5',
 		array(
-			'comment-form',
-			'comment-list',
 			'gallery',
 			'caption',
 			'search-form',
@@ -34,28 +40,12 @@ function awhitepen_setup() {
 			'style',
 		)
 	);
-	add_theme_support(
-		'custom-logo',
-		array(
-			'height'      => 80,
-			'width'       => 240,
-			'flex-height' => true,
-			'flex-width'  => true,
-		)
-	);
-	add_theme_support( 'customize-selective-refresh-widgets' );
 	add_theme_support( 'editor-styles' );
 	add_editor_style(
 		array(
+			awhitepen_google_fonts_url(),
 			'assets/css/main.css',
 			'assets/css/classic-editor-content.css',
-		)
-	);
-
-	register_nav_menus(
-		array(
-			'primary' => __( 'Primary Menu', 'awhitepen' ),
-			'footer'  => __( 'Footer Menu', 'awhitepen' ),
 		)
 	);
 }
@@ -66,54 +56,24 @@ function awhitepen_content_width() {
 }
 add_action( 'after_setup_theme', 'awhitepen_content_width', 0 );
 
-function awhitepen_widgets_init() {
-	register_sidebar(
-		array(
-			'name'          => __( 'Footer Info', 'awhitepen' ),
-			'id'            => 'footer-info',
-			'description'   => __( 'Optional footer widget area.', 'awhitepen' ),
-			'before_widget' => '<section id="%1$s" class="widget %2$s">',
-			'after_widget'  => '</section>',
-			'before_title'  => '<h2 class="widget-title">',
-			'after_title'   => '</h2>',
-		)
-	);
-}
-add_action( 'widgets_init', 'awhitepen_widgets_init' );
-
 function awhitepen_classic_editor_toolbar_row_1( $buttons, $editor_id ) {
 	if ( ! in_array( $editor_id, array( 'content', 'classic-block' ), true ) ) {
 		return $buttons;
 	}
 
+	// Row one is what gets reached for while writing a sentence.
 	return array(
+		'undo',
+		'redo',
+		'awhitepen_fontsize',
 		'formatselect',
-		'awhitepen_fontsize_named',
-		'fontsizeselect',
-		'awhitepen_lineheight',
-		'awhitepen_columns',
-		'awhitepen_embeds',
+		'blockquote',
 		'bold',
 		'italic',
 		'underline',
 		'strikethrough',
-		'bullist',
-		'numlist',
-		'blockquote',
-		'alignleft',
-		'aligncenter',
-		'alignright',
 		'link',
 		'unlink',
-		'removeformat',
-		'charmap',
-		'forecolor',
-		'backcolor',
-		'outdent',
-		'indent',
-		'undo',
-		'redo',
-		'wp_help',
 	);
 }
 add_filter( 'mce_buttons', 'awhitepen_classic_editor_toolbar_row_1', 20, 2 );
@@ -121,11 +81,6 @@ add_filter( 'mce_buttons', 'awhitepen_classic_editor_toolbar_row_1', 20, 2 );
 function awhitepen_classic_editor_external_plugins( $plugins ) {
 	$plugins = is_array( $plugins ) ? $plugins : array();
 
-	$plugins['awhitepen_lineheight'] = add_query_arg(
-		'ver',
-		rawurlencode( awhitepen_asset_version( '/assets/js/classic-editor-lineheight.js' ) ),
-		AWHITEPEN_URI . '/assets/js/classic-editor-lineheight.js'
-	);
 	$plugins['awhitepen_fontsize'] = add_query_arg(
 		'ver',
 		rawurlencode( awhitepen_asset_version( '/assets/js/classic-editor-fontsize.js' ) ),
@@ -146,12 +101,31 @@ function awhitepen_classic_editor_external_plugins( $plugins ) {
 }
 add_filter( 'mce_external_plugins', 'awhitepen_classic_editor_external_plugins' );
 
+/**
+ * Row two: shaping what is already written. Always shown, never behind the
+ * kitchen-sink toggle (see wordpress_adv_hidden).
+ */
 function awhitepen_classic_editor_toolbar_row_2( $buttons, $editor_id ) {
 	if ( ! in_array( $editor_id, array( 'content', 'classic-block' ), true ) ) {
 		return $buttons;
 	}
 
-	return array();
+	return array(
+		'alignleft',
+		'aligncenter',
+		'alignright',
+		'outdent',
+		'indent',
+		'bullist',
+		'numlist',
+		'forecolor',
+		'backcolor',
+		'awhitepen_columns',
+		'awhitepen_embeds',
+		'charmap',
+		'removeformat',
+		'wp_help',
+	);
 }
 add_filter( 'mce_buttons_2', 'awhitepen_classic_editor_toolbar_row_2', 20, 2 );
 
@@ -160,25 +134,58 @@ function awhitepen_classic_editor_settings( $init, $editor_id ) {
 		return $init;
 	}
 
-	$color_map = array(
-		'222222', 'Body text',
-		'505050', 'Muted text',
-		'35566B', 'Link blue',
-		'4F6B57', 'Green',
-		'8A4B4B', 'Red',
-		'F6F4EF', 'Warm highlight',
-		'E3EBE2', 'Soft sage highlight',
-		'F0E1E1', 'Soft rose highlight',
+	// Text and highlight have separate palettes now: text is dark and saturated,
+	// highlight is a set of pale tints so the text on them stays readable. The
+	// last three text colours are the white-pen ones, which hide on the page.
+	$text_color_map = array(
+		'201D16', 'Body text',
+		'16140E', 'Ink',
+		'28496A', 'Accent blue dark',
+		'35618E', 'Accent blue',
+		'B3352A', 'Red',
+		'2B7549', 'Green',
+		'857E70', 'Muted text',
+		'E5E0D5', 'Edge',
+		'F4F2EC', 'Page background',
+		'FFFFFF', 'Surface',
+	);
+
+	$highlight_color_map = array(
+		'F2E3A0', 'Yellow',
+		'F5D9BF', 'Peach',
+		'F2CFC9', 'Red',
+		'E5D8EE', 'Lilac',
+		'D6E2EE', 'Blue',
+		'CFE6E4', 'Teal',
+		'D5E6CC', 'Green',
+		'E5E0D5', 'Sand',
 	);
 
 	$init['wordpress_adv_hidden'] = false;
-	$init['block_formats']        = 'Paragraph=p;Heading 1=h1;Heading 2=h2;Heading 3=h3;Heading 4=h4;Code block=pre';
-	$init['fontsize_formats']     = '14px 15px 18px 20px 24px 32px';
-	$init['textcolor_map']        = wp_json_encode( $color_map );
-	$init['color_map']            = wp_json_encode( $color_map );
-	$init['textcolor_rows']       = 2;
-	$init['color_cols']           = 4;
-	$init['custom_colors']        = true;
+	$init['block_formats']        = 'Paragraph=p;Heading 2=h2;Heading 3=h3;Heading 4=h4;Quote=blockquote;Quote source=quotesource;Code block=pre';
+
+	/*
+	 * TinyMCE writes strikethrough and underline as styled spans, which the
+	 * design has no rule for. It styles <del> and <u>, so the buttons write
+	 * those instead and new text matches what is already in the posts.
+	 */
+	$init['formats'] = wp_json_encode(
+		array(
+			'strikethrough' => array( 'inline' => 'del' ),
+			'underline'     => array( 'inline' => 'u' ),
+			// The source line inside a quote. The design adds the dash and size.
+			'quotesource'   => array(
+				'block'   => 'p',
+				'classes' => 'quote-source',
+			),
+		)
+	);
+	// Four across, plus the "No color" cell the plugin appends to each grid.
+	$init['forecolor_map']  = wp_json_encode( $text_color_map );
+	$init['backcolor_map']  = wp_json_encode( $highlight_color_map );
+	$init['forecolor_rows'] = 3;
+	$init['backcolor_rows'] = 3;
+	$init['textcolor_cols'] = 4;
 	$init['schema']               = 'html5';
 	$init['extended_valid_elements'] = trim(
 		( isset( $init['extended_valid_elements'] ) ? (string) $init['extended_valid_elements'] . ',' : '' ) .
@@ -199,8 +206,9 @@ function awhitepen_classic_editor_settings( $init, $editor_id ) {
 		( isset( $init['valid_children'] ) ? (string) $init['valid_children'] . ',' : '' ) .
 		'+div[a],+a[div|span|img],+div[iframe]'
 	);
+	// `entry` makes the design's post typography apply to the editor body.
 	$init['body_class']           = trim(
-		( isset( $init['body_class'] ) ? (string) $init['body_class'] : '' ) . ' awhitepen-editor-content'
+		( isset( $init['body_class'] ) ? (string) $init['body_class'] : '' ) . ' awhitepen-editor-content entry'
 	);
 
 	return $init;
@@ -242,7 +250,13 @@ function awhitepen_split_columns_content( $content, $columns_count ) {
 function awhitepen_render_columns_shortcode( $content, $columns_count ) {
 	$columns_count = (int) $columns_count;
 	$columns_count = max( 2, min( 3, $columns_count ) );
-	$segments      = awhitepen_split_columns_content( $content, $columns_count );
+
+	// wpautop runs before shortcodes, so an enclosing shortcode spanning several
+	// paragraphs arrives with an orphan </p> at the front and <p> at the end.
+	$content = preg_replace( '#^\s*</p>#', '', (string) $content );
+	$content = preg_replace( '#<p>\s*$#', '', $content );
+
+	$segments = awhitepen_split_columns_content( $content, $columns_count );
 
 	$html = '<div class="awhitepen-columns awhitepen-columns--' . $columns_count . '">';
 
@@ -272,10 +286,12 @@ function awhitepen_enqueue_classic_editor_admin_assets( $hook_suffix ) {
 		return;
 	}
 
+	wp_enqueue_style( 'awhitepen-fonts', awhitepen_google_fonts_url(), array(), null );
+
 	wp_enqueue_style(
 		'awhitepen-classic-editor-admin',
 		AWHITEPEN_URI . '/assets/css/classic-editor-admin.css',
-		array(),
+		array( 'awhitepen-fonts' ),
 		awhitepen_asset_version( '/assets/css/classic-editor-admin.css' )
 	);
 
@@ -300,10 +316,12 @@ function awhitepen_asset_version( $relative_path ) {
 }
 
 function awhitepen_enqueue_assets() {
+	wp_enqueue_style( 'awhitepen-fonts', awhitepen_google_fonts_url(), array(), null );
+
 	wp_enqueue_style(
 		'awhitepen-main',
 		AWHITEPEN_URI . '/assets/css/main.css',
-		array(),
+		array( 'awhitepen-fonts' ),
 		awhitepen_asset_version( '/assets/css/main.css' )
 	);
 
@@ -315,6 +333,106 @@ function awhitepen_enqueue_assets() {
 		true
 	);
 
+	// The page picks this template by its slug, or by an explicit assignment.
+	if ( is_page( 'portfolio' ) || is_page_template( 'page-portfolio.php' ) ) {
+		wp_enqueue_script(
+			'awhitepen-portfolio',
+			AWHITEPEN_URI . '/assets/js/portfolio.js',
+			array(),
+			awhitepen_asset_version( '/assets/js/portfolio.js' ),
+			true
+		);
+	}
+
+	// page-status.php is picked by the 'status' slug. One stylesheet for the whole
+	// page; one script per dashboard, each reading its own endpoint.
+	if ( is_page( 'status' ) ) {
+		wp_enqueue_style(
+			'awhitepen-status',
+			AWHITEPEN_URI . '/assets/css/status.css',
+			array( 'awhitepen-main' ),
+			awhitepen_asset_version( '/assets/css/status.css' )
+		);
+
+		// Everything more than one dashboard needs — macro targets, fixed monthly
+		// costs, formatting, the skeleton, the failure card — lives in one script
+		// the other four depend on.
+		wp_enqueue_script(
+			'awhitepen-status-shared',
+			AWHITEPEN_URI . '/assets/js/status-shared.js',
+			array(),
+			awhitepen_asset_version( '/assets/js/status-shared.js' ),
+			true
+		);
+
+		// The failure card is written per kind of failure, not per dashboard: the
+		// reader wants to know whether it is broken, slow or rate limited.
+		wp_localize_script(
+			'awhitepen-status-shared',
+			'awhitepenStatusText',
+			array(
+				'retry'     => __( 'Try again', 'awhitepen' ),
+				'retryWait' => __( 'Try again shortly', 'awhitepen' ),
+				'triedAt'   => __( 'Tried at', 'awhitepen' ),
+				'server'    => array(
+					'tag'   => __( 'Error 5xx', 'awhitepen' ),
+					'head'  => __( 'The server’s having a lie-down.', 'awhitepen' ),
+					'lead1' => __( 'That one’s on me.', 'awhitepen' ),
+					'body1' => __( 'My server tripped over something while fetching the numbers.', 'awhitepen' ),
+					'lead2' => __( 'Nothing to fix on your end.', 'awhitepen' ),
+					'body2' => __( 'Try again in a few minutes. The other tabs may have better luck.', 'awhitepen' ),
+				),
+				'network'   => array(
+					'tag'   => __( 'Timed out', 'awhitepen' ),
+					'head'  => __( 'The numbers got lost on the way.', 'awhitepen' ),
+					'lead1' => __( 'Could be you, could be me.', 'awhitepen' ),
+					'body1' => __( 'Either your connection dropped or my server took too long to reply. From here I can’t tell which.', 'awhitepen' ),
+					'lead2' => __( 'Check you’re online, then try again.', 'awhitepen' ),
+					'body2' => __( 'If it keeps happening, it’s probably me.', 'awhitepen' ),
+				),
+				'rate'      => array(
+					'tag'   => __( '429', 'awhitepen' ),
+					'head'  => __( 'Too many requests, too quickly.', 'awhitepen' ),
+					'lead1' => __( 'That’s my speed limit, not a fault.', 'awhitepen' ),
+					'body1' => __( 'The server wants a short breather before it answers again.', 'awhitepen' ),
+					'lead2' => __( 'Give it a moment.', 'awhitepen' ),
+					'body2' => __( 'The button below wakes up when it’s ready. Nothing is broken.', 'awhitepen' ),
+				),
+			)
+		);
+
+		$status_api = 'https://project-b-2t23se6ira-as.a.run.app/api/data-visualisation/';
+
+		// handle => [ endpoint, the name the failure card shows ].
+		$status_scripts = array(
+			'status'    => array( 'today', __( 'TODAY', 'awhitepen' ) ),
+			'body'      => array( 'body', __( 'BODY', 'awhitepen' ) ),
+			'fuel'      => array( 'fuel', __( 'FUEL', 'awhitepen' ) ),
+			'resources' => array( 'resources', __( 'RESOURCES', 'awhitepen' ) ),
+		);
+
+		foreach ( $status_scripts as $name => $script ) {
+			$file = '/assets/js/' . $name . '.js';
+
+			wp_enqueue_script(
+				'awhitepen-' . $name,
+				AWHITEPEN_URI . $file,
+				array( 'awhitepen-status-shared' ),
+				awhitepen_asset_version( $file ),
+				true
+			);
+
+			wp_localize_script(
+				'awhitepen-' . $name,
+				'awhitepen' . ucfirst( $name ),
+				array(
+					'url'   => $status_api . $script[0],
+					'label' => $script[1],
+				)
+			);
+		}
+	}
+
 	wp_localize_script(
 		'awhitepen-main',
 		'awhitepenTheme',
@@ -323,11 +441,93 @@ function awhitepen_enqueue_assets() {
 			'collapseLabel'   => __( 'Close menu', 'awhitepen' ),
 			'darkModeLabel'   => __( 'Enable dark mode', 'awhitepen' ),
 			'lightModeLabel'  => __( 'Enable light mode', 'awhitepen' ),
+			'codeMoreLabel'   => __( 'Continue', 'awhitepen' ),
+			'codeLessLabel'   => __( 'Less', 'awhitepen' ),
 			'themeStorageKey' => 'awhitepen-theme',
 		)
 	);
 }
 add_action( 'wp_enqueue_scripts', 'awhitepen_enqueue_assets' );
+
+function awhitepen_font_preconnect( $urls, $relation_type ) {
+	if ( 'preconnect' === $relation_type ) {
+		$urls[] = array(
+			'href' => 'https://fonts.googleapis.com',
+		);
+		$urls[] = array(
+			'href'        => 'https://fonts.gstatic.com',
+			'crossorigin' => '',
+		);
+	}
+
+	return $urls;
+}
+add_filter( 'wp_resource_hints', 'awhitepen_font_preconnect', 10, 2 );
+
+/**
+ * Wrap post tables so they can scroll.
+ *
+ * The design gives tables a 600px minimum and puts them in a .tbl box that
+ * scrolls sideways. The editor writes a bare <table>, so add the box here or a
+ * table pushes the whole page wider than the phone it is read on.
+ */
+function awhitepen_wrap_content_tables( $content ) {
+	if ( false === stripos( $content, '<table' ) || false !== stripos( $content, 'class="tbl"' ) ) {
+		return $content;
+	}
+
+	if ( substr_count( strtolower( $content ), '<table' ) !== substr_count( strtolower( $content ), '</table>' ) ) {
+		return $content;
+	}
+
+	$content = preg_replace( '#<table\b#i', '<div class="tbl"><table', $content );
+
+	return preg_replace( '#</table>#i', '</table></div>', $content );
+}
+add_filter( 'the_content', 'awhitepen_wrap_content_tables', 20 );
+
+/**
+ * Stop WordPress swapping emoji for Twemoji images.
+ *
+ * Core replaces every emoji with an SVG fetched from s.w.org, which renders in
+ * Twitter's style rather than the reader's own. Unhooking the conversion leaves
+ * the characters as typed and drops a script, a stylesheet and the prefetch.
+ */
+function awhitepen_disable_emoji_conversion() {
+	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+	remove_action( 'wp_print_styles', 'print_emoji_styles' );
+	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+	remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+	remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+	remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+}
+add_action( 'init', 'awhitepen_disable_emoji_conversion' );
+
+// The classic editor loads the same conversion as a TinyMCE plugin.
+function awhitepen_remove_tinymce_emoji( $plugins ) {
+	return is_array( $plugins ) ? array_diff( $plugins, array( 'wpemoji' ) ) : array();
+}
+add_filter( 'tiny_mce_plugins', 'awhitepen_remove_tinymce_emoji' );
+
+// Without the conversion there is nothing left to fetch from s.w.org.
+function awhitepen_remove_emoji_prefetch( $urls, $relation_type ) {
+	if ( 'dns-prefetch' !== $relation_type ) {
+		return $urls;
+	}
+
+	return array_values(
+		array_filter(
+			$urls,
+			function ( $url ) {
+				$href = is_array( $url ) && isset( $url['href'] ) ? $url['href'] : $url;
+
+				return ! ( is_string( $href ) && false !== strpos( $href, 's.w.org' ) );
+			}
+		)
+	);
+}
+add_filter( 'wp_resource_hints', 'awhitepen_remove_emoji_prefetch', 10, 2 );
 
 function awhitepen_output_theme_bootstrap_script() {
 	?>
@@ -620,55 +820,65 @@ function awhitepen_get_current_blog_category_context() {
 	return null;
 }
 
-function awhitepen_get_category_hierarchy_label( $term ) {
-	$term = get_term( $term, 'category' );
+/**
+ * Categories for a meta line.
+ *
+ * Every category the post carries, in alphabetical order. A child is shown as
+ * "Parent > Child" and replaces its parent, so a post filed under both Life and
+ * Projects reads "Life > Projects" once. The default category is never printed.
+ */
+function awhitepen_get_post_category_meta_html( $post = null ) {
+	$post       = get_post( $post );
+	$categories = $post instanceof WP_Post ? get_the_category( $post->ID ) : array();
 
-	if ( ! $term instanceof WP_Term ) {
+	if ( empty( $categories ) ) {
 		return '';
 	}
-
-	$trail_ids = array_reverse( get_ancestors( $term->term_id, 'category', 'taxonomy' ) );
-	$trail_ids[] = $term->term_id;
 
 	$default_category_id = awhitepen_default_category_id();
-	$labels              = array();
+	$terms               = array();
 
-	foreach ( $trail_ids as $trail_id ) {
-		$trail_term = get_term( $trail_id, 'category' );
-
-		if ( ! $trail_term instanceof WP_Term ) {
-			continue;
+	foreach ( $categories as $category ) {
+		if ( $category instanceof WP_Term && $category->term_id !== $default_category_id ) {
+			$terms[ $category->term_id ] = $category;
 		}
-
-		if ( $trail_term->term_id === $default_category_id && count( $trail_ids ) > 1 ) {
-			continue;
-		}
-
-		$labels[] = $trail_term->name;
 	}
 
-	return implode( ' > ', $labels );
-}
+	// A parent whose child is also on the post is already in that child's label.
+	foreach ( $terms as $term ) {
+		unset( $terms[ $term->parent ] );
+	}
 
-function awhitepen_get_post_category_meta_html( $post = null ) {
-	$category = awhitepen_get_preferred_post_category( $post );
+	$links = array();
 
-	if ( ! $category instanceof WP_Term ) {
+	foreach ( $terms as $term ) {
+		$link = get_term_link( $term );
+
+		if ( is_wp_error( $link ) ) {
+			continue;
+		}
+
+		$label = esc_html( $term->name );
+		$parent = $term->parent ? get_term( $term->parent, 'category' ) : null;
+
+		if ( $parent instanceof WP_Term && $parent->term_id !== $default_category_id ) {
+			$label = esc_html( $parent->name ) . '<span class="meta-cats__sep">&rsaquo;</span>' . $label;
+		}
+
+		$links[ wp_strip_all_tags( $label ) ] = sprintf(
+			'<a href="%1$s">%2$s</a>',
+			esc_url( $link ),
+			$label
+		);
+	}
+
+	if ( empty( $links ) ) {
 		return '';
 	}
 
-	$label         = awhitepen_get_category_hierarchy_label( $category );
-	$category_link = get_term_link( $category );
+	ksort( $links );
 
-	if ( is_wp_error( $category_link ) || '' === $label ) {
-		return esc_html( $label );
-	}
-
-	return sprintf(
-		'<a href="%1$s">%2$s</a>',
-		esc_url( $category_link ),
-		esc_html( $label )
-	);
+	return '<span class="meta-cats">' . implode( '', $links ) . '</span>';
 }
 
 function awhitepen_render_blog_section_nav() {
@@ -692,520 +902,53 @@ function awhitepen_render_blog_section_nav() {
 	</nav>
 	<?php
 }
-
-function awhitepen_render_blog_menu_terms( $parent = 0, $current_term_id = 0 ) {
-	$terms = awhitepen_get_blog_category_terms( $parent );
-
-	if ( empty( $terms ) ) {
-		return;
-	}
+/**
+ * Primary navigation.
+ *
+ * The five items are fixed and the Blog dropdown is built from the live category
+ * terms, so there is no WordPress menu to assign or maintain.
+ */
+function awhitepen_render_primary_nav() {
+	$is_blog = is_home() || is_archive() || is_single() || is_search() || awhitepen_is_virtual_blog_request();
+	$pages   = array(
+		'portfolio' => __( 'Portfolio', 'awhitepen' ),
+		'status'    => __( 'Status', 'awhitepen' ),
+		'about'     => __( 'About', 'awhitepen' ),
+		'contact'   => __( 'Contact', 'awhitepen' ),
+	);
 	?>
-	<ul class="sub-menu">
-		<?php foreach ( $terms as $term ) : ?>
-			<?php
-			$term_link = get_term_link( $term );
-
-			if ( is_wp_error( $term_link ) ) {
-				continue;
-			}
-
-			$children = awhitepen_get_blog_category_terms( $term->term_id );
-			$classes  = array( 'menu-item', 'menu-item-type-taxonomy', 'menu-item-object-category' );
-
-			if ( ! empty( $children ) ) {
-				$classes[] = 'menu-item-has-children';
-			}
-
-			if ( $current_term_id === (int) $term->term_id ) {
-				$classes[] = 'current-menu-item';
-			} elseif ( awhitepen_term_is_in_branch( $term->term_id, $current_term_id ) ) {
-				$classes[] = 'current-menu-ancestor';
-			}
-			?>
-			<li class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
-				<a href="<?php echo esc_url( $term_link ); ?>">
-					<?php echo esc_html( $term->name ); ?>
-				</a>
-				<?php if ( ! empty( $children ) ) : ?>
-					<?php awhitepen_render_blog_menu_terms( $term->term_id, $current_term_id ); ?>
+	<div class="nav-item has-sub">
+		<a<?php echo $is_blog ? ' class="on"' : ''; ?> href="<?php echo esc_url( awhitepen_posts_page_url() ); ?>">
+			<?php esc_html_e( 'Blog', 'awhitepen' ); ?>
+			<svg class="caret" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 9l7 7 7-7"></path></svg>
+		</a>
+		<ul class="sub-menu">
+			<li><a href="<?php echo esc_url( awhitepen_posts_page_url() ); ?>"><?php esc_html_e( 'All posts', 'awhitepen' ); ?></a></li>
+			<?php foreach ( awhitepen_get_blog_category_terms( 0 ) as $term ) : ?>
+				<?php $term_link = get_term_link( $term ); ?>
+				<?php if ( is_wp_error( $term_link ) ) : ?>
+					<?php continue; ?>
 				<?php endif; ?>
-			</li>
-		<?php endforeach; ?>
-	</ul>
+				<li><a href="<?php echo esc_url( $term_link ); ?>"<?php echo is_category( $term->term_id ) ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $term->name ); ?></a></li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+	<?php foreach ( $pages as $slug => $label ) : ?>
+		<a<?php echo is_page( $slug ) ? ' class="on"' : ''; ?> href="<?php echo esc_url( home_url( '/' . $slug . '/' ) ); ?>"><?php echo esc_html( $label ); ?></a>
+	<?php endforeach; ?>
 	<?php
 }
 
-function awhitepen_is_blog_menu_item( $item ) {
-	if ( ! is_object( $item ) ) {
-		return false;
+
+/**
+ * Contextual label shown beside the wordmark in the header.
+ */
+function awhitepen_brand_tag() {
+	if ( is_page( 'status' ) ) {
+		return __( 'Status', 'awhitepen' );
 	}
 
-	$posts_page_id  = (int) get_option( 'page_for_posts' );
-	$posts_page_url = awhitepen_normalize_path_for_compare( wp_parse_url( awhitepen_posts_page_url(), PHP_URL_PATH ) );
-	$item_url       = awhitepen_normalize_path_for_compare( isset( $item->url ) ? wp_parse_url( $item->url, PHP_URL_PATH ) : '' );
-
-	if ( $posts_page_id > 0 && isset( $item->object_id ) && (int) $item->object_id === $posts_page_id ) {
-		return true;
-	}
-
-	if ( '' !== $posts_page_url && '' !== $item_url ) {
-		return $posts_page_url === $item_url;
-	}
-
-	$item_title = isset( $item->title ) ? trim( wp_strip_all_tags( (string) $item->title ) ) : '';
-
-	if ( '' !== $item_title && 0 === strcasecmp( $item_title, 'blog' ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function awhitepen_normalize_path_for_compare( $path ) {
-	if ( ! is_string( $path ) || '' === trim( $path ) ) {
-		return '';
-	}
-
-	$normalized = untrailingslashit( rawurldecode( $path ) );
-
-	return '' === $normalized ? '/' : $normalized;
-}
-
-function awhitepen_current_request_path() {
-	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-	$path        = wp_parse_url( $request_uri, PHP_URL_PATH );
-
-	return awhitepen_normalize_path_for_compare( is_string( $path ) ? $path : '' );
-}
-
-function awhitepen_is_page_slug_menu_item( $item, $slug, $fallback_title = '' ) {
-	if ( ! is_object( $item ) ) {
-		return false;
-	}
-
-	$slug = is_string( $slug ) ? trim( $slug, '/' ) : '';
-
-	if ( '' === $slug ) {
-		return false;
-	}
-
-	static $page_ids = array();
-
-	if ( ! isset( $page_ids[ $slug ] ) ) {
-		$page                = get_page_by_path( $slug );
-		$page_ids[ $slug ] = $page instanceof WP_Post ? (int) $page->ID : 0;
-	}
-
-	$page_url_path = awhitepen_normalize_path_for_compare( wp_parse_url( home_url( '/' . $slug . '/' ), PHP_URL_PATH ) );
-	$item_url_path = awhitepen_normalize_path_for_compare( isset( $item->url ) ? wp_parse_url( $item->url, PHP_URL_PATH ) : '' );
-
-	if ( $page_ids[ $slug ] > 0 && isset( $item->object_id ) && (int) $item->object_id === $page_ids[ $slug ] ) {
-		return true;
-	}
-
-	if ( '' !== $page_url_path && '' !== $item_url_path ) {
-		return $page_url_path === $item_url_path;
-	}
-
-	$item_title = isset( $item->title ) ? trim( wp_strip_all_tags( (string) $item->title ) ) : '';
-	$title      = '' !== $fallback_title ? $fallback_title : $slug;
-
-	if ( '' !== $item_title && 0 === strcasecmp( $item_title, $title ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-function awhitepen_is_about_menu_item( $item ) {
-	return awhitepen_is_page_slug_menu_item( $item, 'about', 'About' );
-}
-
-function awhitepen_is_portfolio_menu_item( $item ) {
-	return awhitepen_is_page_slug_menu_item( $item, 'portfolio', 'Portfolio' );
-}
-
-function awhitepen_is_status_menu_item( $item ) {
-	return awhitepen_is_page_slug_menu_item( $item, 'status', 'Status' );
-}
-
-function awhitepen_menu_item_descends_from( $item, $ancestor_id, $items_by_id ) {
-	if ( ! is_object( $item ) ) {
-		return false;
-	}
-
-	$parent_id = isset( $item->menu_item_parent ) ? (int) $item->menu_item_parent : 0;
-
-	while ( $parent_id > 0 ) {
-		if ( $parent_id === (int) $ancestor_id ) {
-			return true;
-		}
-
-		if ( empty( $items_by_id[ $parent_id ] ) ) {
-			break;
-		}
-
-		$parent_id = (int) $items_by_id[ $parent_id ]->menu_item_parent;
-	}
-
-	return false;
-}
-
-function awhitepen_build_dynamic_blog_menu_items( $parent_item_id, $parent_term_id, &$next_id, $current_term_id = 0 ) {
-	$dynamic_items = array();
-	$terms         = awhitepen_get_blog_category_terms( $parent_term_id );
-
-	foreach ( $terms as $term ) {
-		$children = awhitepen_get_blog_category_terms( $term->term_id );
-		$classes  = array(
-			'menu-item',
-			'menu-item-type-taxonomy',
-			'menu-item-object-category',
-			'menu-item-' . $term->term_id,
-		);
-
-		if ( ! empty( $children ) ) {
-			$classes[] = 'menu-item-has-children';
-		}
-
-		if ( $current_term_id === (int) $term->term_id ) {
-			$classes[] = 'current-menu-item';
-		} elseif ( awhitepen_term_is_in_branch( $term->term_id, $current_term_id ) ) {
-			$classes[] = 'current-menu-ancestor';
-		}
-
-		$term_link = get_term_link( $term );
-
-		if ( is_wp_error( $term_link ) ) {
-			continue;
-		}
-
-		$item                    = new stdClass();
-		$item->ID                = $next_id++;
-		$item->db_id             = $item->ID;
-		$item->menu_item_parent  = (int) $parent_item_id;
-		$item->object_id         = (int) $term->term_id;
-		$item->object            = 'category';
-		$item->type              = 'taxonomy';
-		$item->type_label        = __( 'Category', 'awhitepen' );
-		$item->title             = $term->name;
-		$item->url               = $term_link;
-		$item->target            = '';
-		$item->attr_title        = '';
-		$item->description       = '';
-		$item->classes           = $classes;
-		$item->xfn               = '';
-		$item->status            = 'publish';
-		$item->current           = in_array( 'current-menu-item', $classes, true );
-		$item->current_item_ancestor = in_array( 'current-menu-ancestor', $classes, true );
-		$item->current_item_parent   = false;
-		$item->menu_order        = $item->ID;
-
-		$dynamic_items[] = $item;
-
-		if ( ! empty( $children ) ) {
-			$dynamic_items = array_merge(
-				$dynamic_items,
-				awhitepen_build_dynamic_blog_menu_items( $item->ID, $term->term_id, $next_id, $current_term_id )
-			);
-		}
-	}
-
-	return $dynamic_items;
-}
-
-function awhitepen_inject_dynamic_blog_categories_into_menu( $items, $args ) {
-	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
-		return $items;
-	}
-
-	if ( isset( $args->depth ) && 1 === (int) $args->depth ) {
-		return $items;
-	}
-
-	$blog_item = null;
-
-	foreach ( $items as $item ) {
-		if ( isset( $item->menu_item_parent ) && 0 === (int) $item->menu_item_parent && awhitepen_is_blog_menu_item( $item ) ) {
-			$blog_item = $item;
-			break;
-		}
-	}
-
-	if ( ! $blog_item ) {
-		return $items;
-	}
-
-	$current_term = awhitepen_get_current_blog_category_context();
-	$current_term_id = $current_term instanceof WP_Term ? (int) $current_term->term_id : 0;
-	$top_level_terms = awhitepen_get_blog_category_terms( 0 );
-
-	if ( ! empty( $top_level_terms ) ) {
-		$blog_item->classes   = isset( $blog_item->classes ) && is_array( $blog_item->classes ) ? $blog_item->classes : array();
-		$blog_item->classes[] = 'menu-item-has-children';
-		$blog_item->classes   = array_unique( $blog_item->classes );
-	}
-
-	if ( awhitepen_is_virtual_blog_request() || is_home() || is_archive() || is_single() || is_search() ) {
-		$blog_item->classes[] = 'current-menu-item';
-		$blog_item->classes[] = 'current-menu-ancestor';
-		$blog_item->classes   = array_unique( $blog_item->classes );
-	}
-
-	$items_by_id = array();
-
-	foreach ( $items as $item ) {
-		$items_by_id[ (int) $item->ID ] = $item;
-	}
-
-	$next_id   = max( array_map( 'intval', array_keys( $items_by_id ) ) ) + 1000;
-	$new_items = array();
-
-	foreach ( $items as $item ) {
-		if ( awhitepen_menu_item_descends_from( $item, $blog_item->ID, $items_by_id ) ) {
-			continue;
-		}
-
-		$new_items[] = $item;
-
-		if ( (int) $item->ID === (int) $blog_item->ID ) {
-			$new_items = array_merge(
-				$new_items,
-				awhitepen_build_dynamic_blog_menu_items( $blog_item->ID, 0, $next_id, $current_term_id )
-			);
-		}
-	}
-
-	return $new_items;
-}
-add_filter( 'wp_nav_menu_objects', 'awhitepen_inject_dynamic_blog_categories_into_menu', 10, 2 );
-
-function awhitepen_build_static_submenu_item( $parent_item_id, &$next_id, $title, $url, $is_current = false ) {
-	$is_current = (bool) $is_current;
-	$item                   = new stdClass();
-	$item->ID               = $next_id++;
-	$item->db_id            = $item->ID;
-	$item->menu_item_parent = (int) $parent_item_id;
-	$item->object_id        = 0;
-	$item->object           = 'custom';
-	$item->type             = 'custom';
-	$item->type_label       = __( 'Custom Link', 'awhitepen' );
-	$item->title            = $title;
-	$item->url              = $url;
-	$item->target           = '';
-	$item->attr_title       = '';
-	$item->description      = '';
-	$item->classes          = array(
-		'menu-item',
-		'menu-item-type-custom',
-		'menu-item-object-custom',
-	);
-
-	if ( $is_current ) {
-		$item->classes[] = 'current-menu-item';
-	}
-
-	$item->xfn                 = '';
-	$item->status              = 'publish';
-	$item->current             = $is_current;
-	$item->current_item_ancestor = false;
-	$item->current_item_parent   = false;
-	$item->menu_order            = $item->ID;
-
-	return $item;
-}
-
-function awhitepen_inject_about_submenu_into_menu( $items, $args ) {
-	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
-		return $items;
-	}
-
-	if ( isset( $args->depth ) && 1 === (int) $args->depth ) {
-		return $items;
-	}
-
-	$about_item = null;
-
-	foreach ( $items as $item ) {
-		if ( isset( $item->menu_item_parent ) && 0 === (int) $item->menu_item_parent && awhitepen_is_about_menu_item( $item ) ) {
-			$about_item = $item;
-			break;
-		}
-	}
-
-	if ( ! $about_item ) {
-		return $items;
-	}
-
-	$items_by_id = array();
-
-	foreach ( $items as $item ) {
-		$items_by_id[ (int) $item->ID ] = $item;
-	}
-
-	foreach ( $items as $item ) {
-		if ( awhitepen_menu_item_descends_from( $item, $about_item->ID, $items_by_id ) ) {
-			return $items;
-		}
-	}
-
-	$about_item->classes   = isset( $about_item->classes ) && is_array( $about_item->classes ) ? $about_item->classes : array();
-	$about_item->classes[] = 'menu-item-has-children';
-	$about_item->classes   = array_unique( $about_item->classes );
-
-	$current_path = awhitepen_current_request_path();
-	$specs_url    = home_url( '/about-specs/' );
-	$goals_url    = home_url( '/about-goals/' );
-	$specs_path   = awhitepen_normalize_path_for_compare( wp_parse_url( $specs_url, PHP_URL_PATH ) );
-	$goals_path   = awhitepen_normalize_path_for_compare( wp_parse_url( $goals_url, PHP_URL_PATH ) );
-
-	$is_specs_current = '' !== $current_path && $current_path === $specs_path;
-	$is_goals_current = '' !== $current_path && $current_path === $goals_path;
-
-	if ( $is_specs_current || $is_goals_current ) {
-		$about_item->classes[]             = 'current-menu-ancestor';
-		$about_item->classes[]             = 'current-menu-parent';
-		$about_item->classes               = array_unique( $about_item->classes );
-		$about_item->current               = false;
-		$about_item->current_item_ancestor = true;
-		$about_item->current_item_parent   = true;
-	}
-
-	$next_id = ! empty( $items_by_id ) ? max( array_map( 'intval', array_keys( $items_by_id ) ) ) + 1000 : 1000;
-	$children = array(
-		awhitepen_build_static_submenu_item(
-			$about_item->ID,
-			$next_id,
-			__( '"specs"', 'awhitepen' ),
-			$specs_url,
-			$is_specs_current
-		),
-		awhitepen_build_static_submenu_item(
-			$about_item->ID,
-			$next_id,
-			__( 'Goals', 'awhitepen' ),
-			$goals_url,
-			$is_goals_current
-		),
-	);
-
-	$new_items = array();
-
-	foreach ( $items as $item ) {
-		$new_items[] = $item;
-
-		if ( (int) $item->ID === (int) $about_item->ID ) {
-			$new_items = array_merge( $new_items, $children );
-		}
-	}
-
-	return $new_items;
-}
-add_filter( 'wp_nav_menu_objects', 'awhitepen_inject_about_submenu_into_menu', 11, 2 );
-
-function awhitepen_inject_status_into_menu( $items, $args ) {
-	if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
-		return $items;
-	}
-
-	$portfolio_item = null;
-	$about_item     = null;
-
-	foreach ( $items as $item ) {
-		if ( isset( $item->menu_item_parent ) && 0 !== (int) $item->menu_item_parent ) {
-			continue;
-		}
-
-		if ( awhitepen_is_status_menu_item( $item ) ) {
-			return $items;
-		}
-
-		if ( ! $portfolio_item && awhitepen_is_portfolio_menu_item( $item ) ) {
-			$portfolio_item = $item;
-		}
-
-		if ( ! $about_item && awhitepen_is_about_menu_item( $item ) ) {
-			$about_item = $item;
-		}
-	}
-
-	if ( ! $portfolio_item && ! $about_item ) {
-		return $items;
-	}
-
-	$item_ids = array();
-
-	foreach ( $items as $item ) {
-		if ( isset( $item->ID ) ) {
-			$item_ids[] = (int) $item->ID;
-		}
-	}
-
-	$next_id      = ! empty( $item_ids ) ? max( $item_ids ) + 1000 : 1000;
-	$current_path = awhitepen_current_request_path();
-	$status_url   = home_url( '/status/' );
-	$status_path  = awhitepen_normalize_path_for_compare( wp_parse_url( $status_url, PHP_URL_PATH ) );
-	$status_item  = awhitepen_build_static_submenu_item(
-		0,
-		$next_id,
-		__( 'Status', 'awhitepen' ),
-		$status_url,
-		'' !== $current_path && $current_path === $status_path
-	);
-	$new_items    = array();
-
-	foreach ( $items as $item ) {
-		if ( $about_item && (int) $item->ID === (int) $about_item->ID ) {
-			$new_items[] = $status_item;
-		}
-
-		$new_items[] = $item;
-
-		if ( ! $about_item && $portfolio_item && (int) $item->ID === (int) $portfolio_item->ID ) {
-			$new_items[] = $status_item;
-		}
-	}
-
-	return $new_items;
-}
-add_filter( 'wp_nav_menu_objects', 'awhitepen_inject_status_into_menu', 12, 2 );
-
-function awhitepen_primary_navigation_fallback( $args = array() ) {
-	$menu_id         = ! empty( $args['menu_id'] ) ? $args['menu_id'] : 'primary-menu';
-	$menu_class      = ! empty( $args['menu_class'] ) ? $args['menu_class'] : 'menu';
-	$is_blog         = is_home() || is_archive() || is_single() || is_search() || awhitepen_is_virtual_blog_request();
-	$pages           = array(
-		array(
-			'slug'  => 'portfolio',
-			'label' => __( 'Portfolio', 'awhitepen' ),
-		),
-		array(
-			'slug'  => 'status',
-			'label' => __( 'Status', 'awhitepen' ),
-		),
-		array(
-			'slug'  => 'about',
-			'label' => __( 'About', 'awhitepen' ),
-		),
-		array(
-			'slug'  => 'contact',
-			'label' => __( 'Contact', 'awhitepen' ),
-		),
-	);
-	?>
-	<ul id="<?php echo esc_attr( $menu_id ); ?>" class="<?php echo esc_attr( $menu_class ); ?>">
-		<li class="menu-item<?php echo $is_blog ? ' current-menu-item current-menu-ancestor' : ''; ?>">
-			<a href="<?php echo esc_url( awhitepen_posts_page_url() ); ?>"><?php esc_html_e( 'Blog', 'awhitepen' ); ?></a>
-		</li>
-		<?php foreach ( $pages as $page ) : ?>
-			<li class="menu-item<?php echo is_page( $page['slug'] ) ? ' current-menu-item' : ''; ?>">
-				<a href="<?php echo esc_url( home_url( '/' . $page['slug'] . '/' ) ); ?>">
-					<?php echo esc_html( $page['label'] ); ?>
-				</a>
-			</li>
-		<?php endforeach; ?>
-	</ul>
-	<?php
+	return '';
 }
 
 function awhitepen_footer_social_rows() {
@@ -1357,33 +1100,31 @@ function awhitepen_get_mastodon_json( $url, $headers = array() ) {
 	return $body;
 }
 
-function awhitepen_get_mastodon_actor_url( $config ) {
-	$webfinger_url = add_query_arg(
-		array(
-			'resource' => 'acct:' . $config['account_acct'],
-		),
-		trailingslashit( $config['instance_url'] ) . '.well-known/webfinger'
-	);
+/**
+ * Numeric account id for the configured handle.
+ *
+ * Uses the public REST API. The ActivityPub actor endpoint is not usable here:
+ * mastodon.social requires signed requests for it and answers 401 otherwise.
+ */
+function awhitepen_get_mastodon_account_id( $config ) {
+	$handle = strtok( $config['account_acct'], '@' );
 
-	$webfinger = awhitepen_get_mastodon_json( $webfinger_url );
-
-	if ( is_wp_error( $webfinger ) || empty( $webfinger['links'] ) || ! is_array( $webfinger['links'] ) ) {
+	if ( ! is_string( $handle ) || '' === $handle ) {
 		return '';
 	}
 
-	foreach ( $webfinger['links'] as $link ) {
-		if (
-			is_array( $link ) &&
-			! empty( $link['rel'] ) &&
-			'self' === $link['rel'] &&
-			! empty( $link['href'] ) &&
-			is_string( $link['href'] )
-		) {
-			return trim( $link['href'] );
-		}
+	$lookup = awhitepen_get_mastodon_json(
+		add_query_arg(
+			array( 'acct' => $handle ),
+			trailingslashit( $config['instance_url'] ) . 'api/v1/accounts/lookup'
+		)
+	);
+
+	if ( is_wp_error( $lookup ) || empty( $lookup['id'] ) ) {
+		return '';
 	}
 
-	return '';
+	return (string) $lookup['id'];
 }
 
 function awhitepen_normalize_mastodon_excerpt( $html ) {
@@ -1437,141 +1178,60 @@ function awhitepen_footer_module_state_payload( $args = array() ) {
 }
 
 function awhitepen_build_footer_mastodon_feed_data() {
-	$config    = awhitepen_get_mastodon_footer_config();
-	$actor_url = awhitepen_get_mastodon_actor_url( $config );
-	$eyebrow   = __( 'Mastodon', 'awhitepen' );
-
-	if ( '' === $actor_url ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'       => 'unavailable',
-				'eyebrow'     => $eyebrow,
-				'title'       => __( 'Recent Mastodon posts could not be loaded just now.', 'awhitepen' ),
-				'meta'        => __( 'Please try again shortly.', 'awhitepen' ),
-				'profile_url' => $config['profile_url'],
-			)
-		);
-	}
-
-	$actor = awhitepen_get_mastodon_json(
-		$actor_url,
+	$config     = awhitepen_get_mastodon_footer_config();
+	$eyebrow    = __( 'Mastodon', 'awhitepen' );
+	$unavailable = awhitepen_footer_module_state_payload(
 		array(
-			'Accept' => 'application/activity+json, application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+			'state'       => 'unavailable',
+			'eyebrow'     => $eyebrow,
+			'title'       => __( 'Recent Mastodon posts could not be loaded just now.', 'awhitepen' ),
+			'meta'        => __( 'Please try again shortly.', 'awhitepen' ),
+			'profile_url' => $config['profile_url'],
 		)
 	);
 
-	if ( is_wp_error( $actor ) || empty( $actor['outbox'] ) || ! is_string( $actor['outbox'] ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'       => 'unavailable',
-				'eyebrow'     => $eyebrow,
-				'title'       => __( 'Recent Mastodon posts could not be loaded just now.', 'awhitepen' ),
-				'meta'        => __( 'Please try again shortly.', 'awhitepen' ),
-				'profile_url' => $config['profile_url'],
-			)
-		);
+	$account_id = awhitepen_get_mastodon_account_id( $config );
+
+	if ( '' === $account_id ) {
+		return $unavailable;
 	}
 
-	$outbox = awhitepen_get_mastodon_json(
-		$actor['outbox'],
-		array(
-			'Accept' => 'application/activity+json, application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
+	$statuses = awhitepen_get_mastodon_json(
+		add_query_arg(
+			array(
+				'limit'            => 10,
+				'exclude_replies'  => 'true',
+				'exclude_reblogs'  => 'true',
+			),
+			trailingslashit( $config['instance_url'] ) . 'api/v1/accounts/' . rawurlencode( $account_id ) . '/statuses'
 		)
 	);
 
-	if ( is_wp_error( $outbox ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'       => 'unavailable',
-				'eyebrow'     => $eyebrow,
-				'title'       => __( 'Recent Mastodon posts could not be loaded just now.', 'awhitepen' ),
-				'meta'        => __( 'Please try again shortly.', 'awhitepen' ),
-				'profile_url' => $config['profile_url'],
-			)
-		);
-	}
-
-	$ordered_items = array();
-
-	if ( ! empty( $outbox['orderedItems'] ) && is_array( $outbox['orderedItems'] ) ) {
-		$ordered_items = $outbox['orderedItems'];
-	} elseif ( ! empty( $outbox['first'] ) ) {
-		$first_page = $outbox['first'];
-
-		if ( is_string( $first_page ) ) {
-			$first_page = awhitepen_get_mastodon_json(
-				$first_page,
-				array(
-					'Accept' => 'application/activity+json, application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
-				)
-			);
-		}
-
-		if ( is_array( $first_page ) && ! empty( $first_page['orderedItems'] ) && is_array( $first_page['orderedItems'] ) ) {
-			$ordered_items = $first_page['orderedItems'];
-		}
-	}
-
-	if ( empty( $ordered_items ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'       => 'empty',
-				'eyebrow'     => $eyebrow,
-				'title'       => __( 'No recent public Mastodon posts are available yet.', 'awhitepen' ),
-				'meta'        => __( 'Fresh posts will appear here automatically.', 'awhitepen' ),
-				'profile_url' => $config['profile_url'],
-			)
-		);
+	if ( is_wp_error( $statuses ) ) {
+		return $unavailable;
 	}
 
 	$posts = array();
 
-	foreach ( $ordered_items as $item ) {
-		if ( count( $posts ) >= 3 ) {
+	foreach ( $statuses as $status ) {
+		if ( count( $posts ) >= 8 ) {
 			break;
 		}
 
-		if ( ! is_array( $item ) ) {
+		if ( ! is_array( $status ) || empty( $status['url'] ) || ! is_string( $status['url'] ) ) {
 			continue;
 		}
 
-		$type   = ! empty( $item['type'] ) ? $item['type'] : '';
-		$object = array();
-
-		if ( 'Create' === $type && ! empty( $item['object'] ) && is_array( $item['object'] ) ) {
-			$object = $item['object'];
-		} elseif ( 'Note' === $type ) {
-			$object = $item;
-		} else {
-			continue;
-		}
-
-		$excerpt = awhitepen_normalize_mastodon_excerpt( isset( $object['content'] ) ? $object['content'] : '' );
+		$excerpt = awhitepen_normalize_mastodon_excerpt( isset( $status['content'] ) ? $status['content'] : '' );
 
 		if ( '' === $excerpt ) {
 			$excerpt = __( 'A recent public post on Mastodon.', 'awhitepen' );
 		}
 
-		$url = '';
-
-		if ( ! empty( $object['url'] ) && is_string( $object['url'] ) ) {
-			$url = trim( $object['url'] );
-		} elseif ( ! empty( $item['url'] ) && is_string( $item['url'] ) ) {
-			$url = trim( $item['url'] );
-		} elseif ( ! empty( $object['id'] ) && is_string( $object['id'] ) ) {
-			$url = trim( $object['id'] );
-		}
-
-		if ( '' === $url ) {
-			continue;
-		}
-
 		$posts[] = array(
 			'excerpt'   => $excerpt,
-			'url'       => $url,
-			'timestamp' => awhitepen_format_mastodon_timestamp(
-				! empty( $object['published'] ) ? $object['published'] : ( ! empty( $item['published'] ) ? $item['published'] : '' )
-			),
+			'url'       => trim( $status['url'] ),
+			'timestamp' => awhitepen_format_mastodon_timestamp( isset( $status['created_at'] ) ? $status['created_at'] : '' ),
 		);
 	}
 
@@ -2401,10 +2061,6 @@ function awhitepen_page_context( $post = null ) {
 	}
 
 	$contexts = array(
-		'portfolio' => array(
-			'eyebrow' => __( 'Portfolio', 'awhitepen' ),
-			'intro'   => __( 'Selected work, case studies, and public-facing projects collected in one quiet place.', 'awhitepen' ),
-		),
 		'about'     => array(
 			'eyebrow' => __( 'About', 'awhitepen' ),
 			'intro'   => '',
@@ -2431,29 +2087,6 @@ function awhitepen_page_context( $post = null ) {
 		'intro_html' => '',
 	);
 }
-
-function awhitepen_body_classes( $classes ) {
-	if ( is_singular() ) {
-		$classes[] = 'is-singular';
-	} else {
-		$classes[] = 'is-archive-view';
-	}
-
-	if ( is_front_page() ) {
-		$classes[] = 'is-front-page';
-	}
-
-	if ( is_home() ) {
-		$classes[] = 'is-home-view';
-	}
-
-	if ( is_search() ) {
-		$classes[] = 'is-search-view';
-	}
-
-	return $classes;
-}
-add_filter( 'body_class', 'awhitepen_body_classes' );
 
 function awhitepen_excerpt_more( $more ) {
 	if ( is_admin() ) {
@@ -2530,30 +2163,24 @@ function awhitepen_get_stream_excerpt( $post = null, $word_limit = 40 ) {
 	return awhitepen_get_clean_excerpt( $post, $word_limit );
 }
 
-function awhitepen_get_stream_story_classes( $story_index ) {
-	$classes = array( 'story-card', 'story-card--notebook' );
-
-	if ( 0 === (int) $story_index ) {
-		$classes[] = 'story-card--featured';
-	} elseif ( (int) $story_index < 3 ) {
-		$classes[] = 'story-card--medium';
-	} else {
-		$classes[] = 'story-card--compact';
-	}
-
-	return $classes;
+function awhitepen_get_stream_excerpt_words() {
+	return 42;
 }
 
-function awhitepen_get_stream_excerpt_words( $story_index ) {
-	if ( 0 === (int) $story_index ) {
-		return 110;
+/**
+ * Top-level category slug for a post, used by the blog pager to filter cards.
+ * A post in "Life > Projects" reports "life".
+ */
+function awhitepen_get_stream_category_slug( $post = null ) {
+	$category = awhitepen_get_preferred_post_category( $post );
+
+	if ( ! $category instanceof WP_Term ) {
+		return '';
 	}
 
-	if ( (int) $story_index < 3 ) {
-		return 70;
-	}
+	$root = get_term( awhitepen_get_category_root_term_id( $category ), 'category' );
 
-	return 42;
+	return $root instanceof WP_Term ? $root->slug : $category->slug;
 }
 
 function awhitepen_render_notebook_stream( $query = null ) {
@@ -2563,25 +2190,24 @@ function awhitepen_render_notebook_stream( $query = null ) {
 		$query = $wp_query;
 	}
 
-	if ( ! $query instanceof WP_Query || ! $query->have_posts() ) {
+	if ( ! $query instanceof WP_Query ) {
 		return;
 	}
 
-	$story_index = 0;
+	$has_posts = $query->have_posts();
 	?>
 	<div class="story-list story-list--notebook">
 		<?php
 		while ( $query->have_posts() ) :
 			$query->the_post();
 			$category_meta_html = awhitepen_get_post_category_meta_html( get_post() );
-			$excerpt            = awhitepen_get_stream_excerpt( get_post(), awhitepen_get_stream_excerpt_words( $story_index ) );
+			$excerpt            = awhitepen_get_stream_excerpt( get_post(), awhitepen_get_stream_excerpt_words() );
+			$category_slug      = awhitepen_get_stream_category_slug( get_post() );
 			?>
-			<article id="post-<?php the_ID(); ?>" <?php post_class( awhitepen_get_stream_story_classes( $story_index ) ); ?>>
+			<article id="post-<?php the_ID(); ?>" data-cat="<?php echo esc_attr( $category_slug ); ?>" class="story-card">
 				<p class="story-card__meta">
-					<span><?php echo esc_html( get_the_date() ); ?></span>
-					<?php if ( $category_meta_html ) : ?>
-						<span><?php echo wp_kses_post( $category_meta_html ); ?></span>
-					<?php endif; ?>
+					<span><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></span>
+					<?php echo wp_kses_post( $category_meta_html ); ?>
 				</p>
 				<h2 class="story-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 				<?php if ( $excerpt ) : ?>
@@ -2592,10 +2218,15 @@ function awhitepen_render_notebook_stream( $query = null ) {
 				<p class="story-card__cta"><a class="text-link" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Continue reading', 'awhitepen' ); ?></a></p>
 			</article>
 			<?php
-			++$story_index;
 		endwhile;
 		?>
+		<p class="story-empty"<?php echo $has_posts ? ' hidden' : ''; ?>><?php esc_html_e( 'Nothing here yet.', 'awhitepen' ); ?></p>
 	</div>
+	<nav class="blog-pager" aria-label="<?php esc_attr_e( 'Blog pages', 'awhitepen' ); ?>" hidden>
+		<button type="button" class="text-link" data-pg="-1">&larr; <?php esc_html_e( 'Previous', 'awhitepen' ); ?></button>
+		<span class="blog-pager__n"></span>
+		<button type="button" class="text-link" data-pg="1"><?php esc_html_e( 'Next', 'awhitepen' ); ?> &rarr;</button>
+	</nav>
 	<?php
 }
 
@@ -2618,19 +2249,36 @@ function awhitepen_render_notebook_header( $kicker = '' ) {
 			<p class="section-kicker"><?php echo esc_html( $kicker ); ?></p>
 		<?php endif; ?>
 		<h1 class="page-title"><?php esc_html_e( 'On B’s mind lately…', 'awhitepen' ); ?></h1>
-		<p class="archive-dek"><?php esc_html_e( 'A running stream of thoughts, observations, and learnings. Opinions subject to potential updates. Persuasive counterarguments welcome.', 'awhitepen' ); ?></p>
+		<p class="archive-dek">
+			<?php esc_html_e( 'A running stream of thoughts, observations, and learnings.', 'awhitepen' ); ?><br>
+			<?php esc_html_e( 'Opinions subject to potential updates.', 'awhitepen' ); ?><br>
+			<?php esc_html_e( 'Persuasive counterarguments welcome.', 'awhitepen' ); ?>
+		</p>
 	</header>
 	<?php
 }
 
-function awhitepen_category_archive_query( $query ) {
-	if ( is_admin() || ! $query->is_main_query() || ! $query->is_category() ) {
+/**
+ * Posts rendered into the blog stream in one go.
+ *
+ * The stream pages 5 at a time in the browser (see the blog pager in main.js), so the
+ * whole set is rendered and the pager hides the cards it is not showing. The cap keeps
+ * the page from growing without limit; move paging back to the server if it is reached.
+ */
+const AWHITEPEN_STREAM_POST_CAP = 100;
+
+function awhitepen_blog_stream_query( $query ) {
+	if ( is_admin() || ! $query->is_main_query() ) {
 		return;
 	}
 
-	$query->set( 'posts_per_page', 8 );
+	if ( ! $query->is_home() && ! $query->is_category() ) {
+		return;
+	}
+
+	$query->set( 'posts_per_page', AWHITEPEN_STREAM_POST_CAP );
 	$query->set( 'ignore_sticky_posts', true );
 	$query->set( 'orderby', 'date' );
 	$query->set( 'order', 'DESC' );
 }
-add_action( 'pre_get_posts', 'awhitepen_category_archive_query' );
+add_action( 'pre_get_posts', 'awhitepen_blog_stream_query' );
