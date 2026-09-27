@@ -8,73 +8,46 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main">
+<main class="site-main">
 	<div class="site-shell">
 		<?php
 		while ( have_posts() ) :
 			the_post();
+
 			$category_meta_html = awhitepen_get_post_category_meta_html( get_post() );
+			$previous_post      = get_previous_post();
+			$next_post          = get_next_post();
 			?>
-			<article id="post-<?php the_ID(); ?>" <?php post_class( 'story-entry' ); ?>>
-				<header class="content-column entry-hero entry-hero--single">
-					<p class="section-kicker"><?php esc_html_e( 'Blog', 'awhitepen' ); ?></p>
-					<h1 class="entry-title"><?php the_title(); ?></h1>
+			<article class="post">
+				<a class="text-link post__crumb" href="<?php echo esc_url( awhitepen_posts_page_url() ); ?>"><?php esc_html_e( 'Blog', 'awhitepen' ); ?></a>
 
-					<?php if ( has_excerpt() ) : ?>
-						<p class="entry-dek"><?php echo esc_html( get_the_excerpt() ); ?></p>
-					<?php endif; ?>
+				<p class="post__meta">
+					<time datetime="<?php echo esc_attr( get_the_date( 'Y-m-d' ) ); ?>"><?php echo esc_html( get_the_date( 'F j, Y' ) ); ?></time>
+					<?php echo wp_kses_post( $category_meta_html ); ?>
+				</p>
 
-					<p class="entry-meta">
-						<span><?php echo esc_html( get_the_date() ); ?></span>
-						<?php if ( $category_meta_html ) : ?>
-							<span><?php echo wp_kses_post( $category_meta_html ); ?></span>
+				<h1 class="post__title"><?php the_title(); ?></h1>
+
+				<div class="entry">
+					<?php the_content(); ?>
+				</div>
+
+				<?php if ( $previous_post || $next_post ) : ?>
+					<nav class="post-nav" aria-label="<?php esc_attr_e( 'Post navigation', 'awhitepen' ); ?>">
+						<?php if ( $previous_post ) : ?>
+							<a class="post-nav__prev" href="<?php echo esc_url( get_permalink( $previous_post ) ); ?>">
+								<span class="post-nav__k">&larr; <?php esc_html_e( 'Previous', 'awhitepen' ); ?></span>
+								<span class="post-nav__t"><?php echo esc_html( get_the_title( $previous_post ) ); ?></span>
+							</a>
 						<?php endif; ?>
-					</p>
-				</header>
-
-				<?php if ( has_post_thumbnail() ) : ?>
-					<figure class="content-column entry-thumbnail">
-						<?php the_post_thumbnail( 'large' ); ?>
-					</figure>
+						<?php if ( $next_post ) : ?>
+							<a class="post-nav__next" href="<?php echo esc_url( get_permalink( $next_post ) ); ?>">
+								<span class="post-nav__k"><?php esc_html_e( 'Next', 'awhitepen' ); ?> &rarr;</span>
+								<span class="post-nav__t"><?php echo esc_html( get_the_title( $next_post ) ); ?></span>
+							</a>
+						<?php endif; ?>
+					</nav>
 				<?php endif; ?>
-
-				<div class="content-column entry-content">
-					<?php
-					the_content();
-
-					wp_link_pages(
-						array(
-							'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Page', 'awhitepen' ) . '">',
-							'after'  => '</nav>',
-						)
-					);
-					?>
-				</div>
-
-				<?php
-				$post_tags = get_the_tag_list( '<p class="post-tags">', ' ', '</p>' );
-
-				if ( $post_tags ) :
-					?>
-					<footer class="content-column entry-footer">
-						<?php echo wp_kses_post( $post_tags ); ?>
-					</footer>
-				<?php endif; ?>
-
-				<div class="content-column">
-					<?php awhitepen_render_stream_browse_section(); ?>
-				</div>
-
-				<footer class="content-column entry-footer">
-					<?php
-					the_post_navigation(
-						array(
-							'prev_text' => '<span class="nav-subtitle">' . esc_html__( 'Previous', 'awhitepen' ) . '</span><span class="nav-title">%title</span>',
-							'next_text' => '<span class="nav-subtitle">' . esc_html__( 'Next', 'awhitepen' ) . '</span><span class="nav-title">%title</span>',
-						)
-					);
-					?>
-				</footer>
 			</article>
 		<?php endwhile; ?>
 	</div>

@@ -1,0 +1,548 @@
+/* ============================================================
+   awhitepen — status dashboards.
+   Loaded only on the status page, on top of main.css's tokens.
+   Page shell, then the widget system every dashboard shares,
+   then what is specific to one dashboard. No tab is the base.
+   ============================================================ */
+
+/* Page head, tabs, panels and the under-construction card, then TODAY.
+   Each remaining dashboard brings its own widget CSS when it is built; the
+   shared system rules below carry every class the four dashboards render. */
+/* The fasting fill. One value, three users: the bar, its cut/carry variants,
+   and the legend swatch that has to match them exactly. */
+:root{--fast-fill:color-mix(in oklch,var(--accent) 34%,transparent)}
+
+.status{line-height:1.5;-webkit-font-smoothing:antialiased}
+.status a{color:var(--accent);text-decoration:none}
+.status a:hover{color:var(--accent-dk)}
+.wrap{position:relative;z-index:1;width:min(100% - clamp(32px,8vw,88px),var(--wide));margin:0 auto;padding:clamp(30px,5vw,54px) 0 120px}
+/* page head */
+.phead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.phead__eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.phead__title{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,46px);letter-spacing:-.03em;line-height:1;margin-top:10px}
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding-bottom:20px;margin-bottom:28px;border-bottom:1px solid var(--edge)}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;cursor:pointer;padding:9px 16px;border-radius:var(--r-pill);border:1px solid var(--edge);background:var(--surface);color:var(--muted);font-family:var(--display);font-weight:700;font-size:13.5px;letter-spacing:.02em;transition:border-color .15s,color .15s,background .15s}
+.tab span{font-family:var(--body);font-weight:500;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+.tab:hover{border-color:var(--accent-out);color:var(--text)}
+.tab.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.tab.on span{color:var(--on-accent-2)}
+@media(max-width:600px){.tabs{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;padding-right:32px;margin-left:calc(-1*clamp(16px,4vw,44px));margin-right:calc(-1*clamp(16px,4vw,44px));padding-left:clamp(16px,4vw,44px);-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none}}
+.panel[hidden]{display:none}
+.panel{display:flex;flex-direction:column;gap:22px}
+/* under construction */
+.wip{background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column;align-items:stretch;text-align:center}
+.wip__tape{height:14px;background:repeating-linear-gradient(45deg,var(--d-gold) 0 11px,transparent 11px 22px);opacity:.55}
+.wip__in{padding:clamp(40px,8vw,84px) 24px}
+.whead__k,.wip__k{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.wip__h{margin-top:12px;font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,40px);letter-spacing:-.035em;line-height:1}
+.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,28px)}
+.wfoot{margin-top:16px;padding-top:14px;border-top:1px dotted var(--rule);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.wfoot .ac{color:var(--accent)}
+.tcl__k,.fkey,.bread__k,.tcats__k,.rrec__k,.favgl__k,.tpres__ck,.bax,.rdonut__k,.fxk{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mtable thead th,.ctr--h,.tact__hd,.flscale--h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tcl__v,.fval,.done__v,.tsum__n--lead{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.03em;line-height:1}
+.bread__v,.tcl__v--word,.tsum__n--tot{font-family:var(--display);font-weight:700;font-size:21px;letter-spacing:-.025em;line-height:1}
+.tcl__v small,.fval small,.bread__v small,.done__v small,.hero-amt small{font-family:var(--body);font-size:12.5px;font-weight:500;color:var(--muted);margin-left:5px;letter-spacing:0}
+.brng,.bsw{display:inline-flex;border:1px solid var(--edge);border-radius:var(--r-pill);padding:2px;gap:2px}
+.bsw{margin-top:12px}
+.brng button,.bsw button{font-family:var(--body);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--muted);padding:5px 10px;border-radius:var(--r-pill);cursor:pointer;white-space:nowrap}
+.brng button:hover,.bsw button:hover{color:var(--accent)}
+.brng button[aria-pressed="true"],.bsw button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent)}
+.bsw button sup{font-size:11px;font-weight:700;color:var(--accent);vertical-align:baseline;margin-left:2px;line-height:0}
+.bsw button[aria-pressed="true"] sup{color:var(--on-accent)}
+.tchip{padding:6px 13px;border:1px solid var(--edge);border-radius:var(--r-pill);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.tchip--done{background:var(--good);border-color:var(--good);color:#16140E}
+.tchip--togo{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.tchip--in{background:color-mix(in oklch,var(--good) 18%,transparent);border-color:transparent;color:var(--good)}
+.tchip--over{background:color-mix(in oklch,var(--alert) 15%,transparent);border-color:transparent;color:var(--alert)}
+.tchip--none{background:var(--edge);border-color:transparent;color:var(--soft)}
+.ttr__s .tchip{font-size:12px;padding:2px 9px}
+.tchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tsoon{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-fg);background:color-mix(in oklch,var(--ink) 84%,transparent);border-radius:var(--r-pill);padding:5px 11px;vertical-align:2px;white-space:nowrap}
+.tnote,.rfn,.tcl__n--sub,.tcats{margin-top:12px;padding-top:11px;border-top:1px dotted var(--rule);font-size:12px;color:var(--muted);line-height:1.5}
+.tcl__n--sub b{color:var(--text);font-weight:600}
+.tnote sup,sup.tmk{font-family:var(--body);font-size:13px;font-weight:700;line-height:0;letter-spacing:0;color:var(--accent);vertical-align:baseline}
+.tnote sup{margin-right:4px}
+sup.tmk{margin-left:3px}
+.tq{color:var(--muted);font-size:12.5px;font-weight:500}
+/* card head */
+.whead{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px 20px;margin-bottom:20px}
+.whead__l{margin-top:7px;font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em;color:var(--text)}
+.whead__l:empty{display:none}
+.whead__l .ac{color:var(--accent)}
+.whead__note{font-size:12px;letter-spacing:.04em;color:var(--muted);text-align:right}
+/* panel grids */
+.grid{display:grid;gap:22px}
+.g-top{align-items:start}
+@media(min-width:760px){.g-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+/* axis ticks */
+.btick,.alscale>div:nth-child(2),.flsc{font-size:10px;font-weight:500;color:var(--muted);fill:var(--muted);font-variant-numeric:tabular-nums}
+/* readouts: S 18 · hero · month */
+.fval--sm,.rdonut__v,.btip__w,.cst__r--tot .cst__v{font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.02em}
+.hero-amt{font-family:var(--display);font-weight:700;font-size:clamp(38px,6vw,56px);letter-spacing:-.03em;line-height:1;margin-top:4px;font-variant-numeric:proportional-nums}
+.hero-amt small{font-size:15px;margin-left:8px}
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:16px;padding-top:14px;border-top:1px dotted var(--rule)}
+.legend__i{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;letter-spacing:.02em;color:var(--muted)}
+.legend__sw{width:10px;height:10px;border-radius:3px;flex:none}
+.legend__i--right{margin-left:auto}
+.legend__sw--dot{width:8px;height:8px;border-radius:var(--r-pill)}
+.legend__sw--line{height:2px;border-radius:2px;width:14px}
+.legend__sw--dia{width:8px;height:8px;border-radius:1px;transform:rotate(45deg)}
+.legend__sw--dotline{width:16px;height:0;border-top:2px dotted currentColor;border-radius:0;background:none!important}
+.legend__sw--weight{background:var(--accent);opacity:.6}
+.legend__sw--avg{background:var(--accent)}
+.legend__sw--fat{background:var(--d-gold)}
+.legend__sw--in{background:var(--d-green)}
+.legend__sw--out{background:var(--d-grey)}
+.legend__sw--long{background:var(--d-red)}
+.legend__sw--target{background:var(--accent-soft)}
+.legend__sw--fasting{background:var(--fast-fill);border:1px solid var(--accent)}
+.legend__sw--asleep{background:var(--accent-dk)}
+.legend__sw--unlogged{border:1px dashed var(--rule)}
+/* segmented control: wrapping + overflow-scrolling variants */
+.brng--wrap{flex-wrap:wrap;margin-bottom:2px}
+.card>.brng--wrap{margin-bottom:16px}
+/* The fade hints that there is more to the right. It is added only when the row
+   actually overflows - see markOverflow in status-shared.js - because on a row
+   that fits it just dissolves the last pill and the border. */
+.brng--scroll{flex-wrap:nowrap;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.brng--scroll.xfade,.rscope .brng--wrap.xfade{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);padding-right:28px}
+.brng--scroll::-webkit-scrollbar{display:none}
+.card>.brng--scroll{margin-bottom:16px}
+/* stepper */
+.bpan{display:inline-flex;align-items:center;gap:10px}
+.bpan button{display:inline-flex;align-items:center;justify-content:center;padding:7px;border:1px solid transparent;border-radius:var(--r-pill);background:none;color:var(--muted);cursor:pointer;line-height:0}
+.bpan button svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bpan button:hover:not(:disabled){color:var(--accent)}
+.bpan button:disabled{opacity:.3;cursor:default}
+.bpanwrap{display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin:15px 0 14px;width:100%}
+/* The label reserves room for the longest range it can hold ("24 Sept \2013 30 Sept",
+   102.6px at this size) so stepping dates never shifts the arrows under the cursor. */
+.bpan__lab{font-size:12.5px;font-weight:600;color:var(--text);min-width:var(--stepper-label-w);text-align:center}
+.bpan__chg{font-size:12px;color:var(--muted)}
+/* the fasting span is fixed at one week, so it is a label rather than a stepper */
+.frange{margin:15px 0 14px;font-size:12.5px;font-weight:600;color:var(--text)}
+[data-alpanwrap]{display:flex;flex-direction:column;align-items:flex-start;width:100%}
+/* ghost button */
+.lmore{display:block;margin:18px auto 0;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;background:none;border:1px solid var(--edge);border-radius:var(--r-pill);padding:9px 18px;color:var(--soft);cursor:pointer}
+.lmore:hover{border-color:var(--accent);color:var(--accent)}
+/* tooltip */
+.btip{position:absolute;z-index:5;min-width:160px;max-width:240px;background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-md);box-shadow:var(--shadow-tip);padding:9px 11px;pointer-events:none}
+.btip[hidden]{display:none}
+.btip__d{font-size:11.5px;font-weight:600;color:var(--muted)}
+.btip__w{margin-top:3px}
+.btip__w--q{color:var(--muted);font-size:15px}
+.btip__w--q:empty{min-height:1lh}
+.btip__w--2{margin-top:8px;padding-top:7px;border-top:1px dotted var(--rule)}
+.btip__w--out{color:var(--alert)}
+.btip__x{margin-top:3px;font-size:12px;color:var(--soft)}
+.btip__bf{margin-top:6px;padding-top:6px;border-top:1px dotted var(--rule);font-size:12px;color:var(--d-gold)}
+/* footnote body + inline helpers */
+.rfn{text-wrap:pretty}
+.rfn b{font-weight:700;color:var(--text)}
+.hint{font-size:12px;color:var(--muted)}
+.nw{white-space:nowrap}
+.wd{display:inline}
+/* hoisted out of a FUEL-specific @media block in the design, which also sets rules FUEL owns */
+@media(max-width:600px){.wd{display:none}}
+/* BODY and FUEL share these chart panes, split readouts and timeline rows. */
+.bsplit{display:grid;gap:14px 18px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);margin-bottom:16px;align-content:start}
+.bsplit>div+div{padding-left:18px;border-left:1px dotted var(--rule)}
+@media(max-width:480px){.bsplit{grid-template-columns:1fr}
+.bsplit>div+div{padding-left:0;border-left:0;padding-top:14px;border-top:1px dotted var(--rule)}}
+.bread__v{margin-top:7px}
+.bread__n{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.45}
+.bread__n b{font-weight:600;color:var(--soft)}
+.bpane{cursor:crosshair;position:relative;min-width:0}
+.bscroll{max-width:100%}
+.bscroll svg{display:block}
+.bgl{stroke:var(--c-gridline);stroke-width:1}
+.alr__d{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.alr__d b{font-weight:600;color:var(--soft)}
+.alr__v{font-size:12.5px;font-weight:600;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* ---------- TODAY ---------- */
+.tpres{background:var(--accent);color:var(--on-accent);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,28px)}
+.tpres__h{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.2vw,42px);letter-spacing:-.035em;line-height:1.04}
+.tpres__off{color:var(--on-accent-3);text-decoration:line-through;text-decoration-thickness:2px}
+.tpres__slash{color:var(--on-accent-3);font-weight:400;margin:0 6px}
+.tpres__sub{margin-top:11px;font-size:13.5px;font-weight:500;color:var(--on-accent-2);font-variant-numeric:tabular-nums}
+.tpres__row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px 26px;margin-top:18px;padding-top:16px;border-top:1px solid var(--on-accent-line)}
+.tpres__ck{color:var(--on-accent-2)}
+.tpres__cv{margin-top:6px;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.015em}
+.tpres__z{font-size:12px;font-weight:500;color:var(--on-accent-2);margin-left:5px}
+/* [page] the Today sheet: cells divided by solid --edge; coloured stripe spans the full cell height so it meets the dividers */
+.tsheet{margin-top:14px;background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);padding:clamp(14px,2vw,22px);display:grid;grid-template-columns:1fr}
+@media(min-width:860px){.tsheet{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tsheet>.tcl:not(:nth-child(3n)){border-right:1px solid var(--edge)}
+.tsheet>.tcl:nth-child(-n+3){border-bottom:1px solid var(--edge)}}
+@media(min-width:600px) and (max-width:859px){.tsheet{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tsheet>.tcl:nth-child(odd){border-right:1px solid var(--edge)}
+.tsheet>.tcl:nth-child(-n+4){border-bottom:1px solid var(--edge)}}
+@media(max-width:599px){.tsheet>.tcl:not(:last-child){border-bottom:1px solid var(--edge)}}
+.tcl{position:relative;padding:16px 20px;min-width:0}
+.tcl::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cc,var(--edge))}
+.tcl__k{display:flex;align-items:center;gap:8px}
+.tcl__k i{width:7px;height:7px;border-radius:2px;flex:none;background:var(--cc)}
+.tcl__v{margin-top:11px}
+.tcl__v small.tcl__v__meta{font-size:12px;font-weight:400;margin-left:8px}
+.tcl__n{margin-top:9px;font-size:13px;color:var(--soft);line-height:1.55}
+.tcl__n--q{color:var(--muted);font-size:12px;margin-top:9px}
+.tplans{margin-top:8px}
+.toff{color:var(--soft);font-size:15px;font-weight:600;text-decoration:line-through;text-decoration-thickness:2px}
+.tslash{color:var(--muted);margin:0 5px;font-size:15px}
+.tsc{margin-top:14px}
+.tsc__t{position:relative;height:10px;border-radius:var(--r-pill);background:var(--edge);overflow:hidden}
+.tsc__f{position:absolute;top:2px;bottom:2px;left:2px;border-radius:var(--r-pill);background:var(--d-gold)}
+.tsc__tick{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--accent)}
+.tsc__lab{position:relative;height:16px;margin-top:6px;font-size:10.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.tsc__lab span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.tsc__s{margin-top:4px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tsc__s--plain{margin-top:9px}
+.ttr{margin-top:14px;display:grid;gap:10px}
+.ttr__r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline}
+.ttr__l{font-size:13.5px;color:var(--soft)}
+.ttr__v{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.ttr__v small{font-size:11.5px;font-weight:500;color:var(--muted);margin-left:2px}
+.ttr__s{grid-column:1/-1;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.trest{margin-top:15px;padding-top:12px;border-top:1px dotted var(--rule);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px}
+.trest__r{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:13px;color:var(--soft)}
+.trest__r b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.trest__r b small{color:var(--muted);font-weight:500;margin-left:2px}
+.tact{margin-top:13px}
+.tact__hd,.tact__r{display:grid;grid-template-columns:minmax(0,1fr) 70px 74px;gap:10px;align-items:baseline}
+.tact__hd{padding-bottom:7px}
+.tact__hd span{white-space:nowrap}
+.tact__r{padding:3px 0;font-size:13.5px;color:var(--soft)}
+.tact__r b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.tact__p{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tact__r--un{border-top:1px dotted var(--rule);margin-top:5px;padding-top:7px;color:var(--muted)}
+.tact__r--un b{color:var(--muted);font-weight:500}
+.tact__f{margin-top:9px;display:grid;gap:3px;font-size:12px;color:var(--muted);line-height:1.45}
+.tsum{margin-top:12px}
+.tsum__r{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.tsum__r+.tsum__r{margin-top:6px}
+.tsum__r--quiet{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:7px;align-items:baseline}
+.tsum__r--quiet .tsum__l{line-height:1.35;text-wrap:pretty}
+.tsum__n{font-family:var(--display);font-weight:700;letter-spacing:-.02em}
+.tsum__n--quiet{font-size:16px;color:var(--soft)}
+.tsum__l{font-size:12.5px;font-weight:500;color:var(--muted)}
+.tsum__op{font-family:var(--display);font-weight:700;font-size:14px;color:var(--muted)}
+.tsum__r--tot{margin-top:10px;padding-top:10px;border-top:1px solid var(--edge-strong)}
+.tsp__small{margin-top:10px;font-size:13.5px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums}
+.tsp__small small{font-size:12.5px;font-weight:500;color:var(--muted);margin-left:6px}
+.tcats{margin-top:13px;padding-top:12px}
+.tcats__k{margin-bottom:7px}
+.tcr{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:6px}
+.tcr__k{font-size:12.5px;color:var(--soft)}
+.tcr__b{height:5px}
+.tcr__b span{display:block;height:100%;background:var(--cc,var(--accent));border-radius:var(--r-pill)}
+.tcr__v{font-size:13px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums}
+
+/* ---------- failure card ---------- */
+/* Replaces a panel when its fetch fails. Reuses .card, .wfoot and .lmore; only
+   the type and the dot are its own. */
+.serr__k{display:flex;align-items:center;gap:8px;margin:0;font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+.serr__dot{flex:none;width:7px;height:7px;border-radius:50%;background:var(--alert)}
+.serr__dot--rate{background:var(--d-gold)}
+.serr__h{margin:12px 0 0;max-width:20em;font-family:var(--display);font-weight:700;font-size:clamp(24px,3vw,32px);line-height:1.1;letter-spacing:-.025em;color:var(--text);text-wrap:balance}
+.serr__p{margin:14px 0 0;max-width:36rem;font-size:16px;line-height:1.55;color:var(--soft);text-wrap:pretty}
+.serr__p+.serr__p{margin-top:8px}
+.serr__h+.serr__p{margin-top:20px}
+.serr__p b{font-weight:700;color:var(--text)}
+.serr .wfoot{margin-top:26px;align-items:center}
+/* .lmore is display:block with auto side margins, which would centre it and break
+   the footer's space-between. Neutralised here only. */
+.serr .lmore{margin:0}
+.serr__try[aria-disabled="true"]{cursor:not-allowed;border-style:dashed;border-color:var(--edge);color:var(--muted);background-color:transparent}
+.serr__try--rate[aria-disabled="true"]{background-image:linear-gradient(var(--edge),var(--edge));background-repeat:no-repeat;background-position:left center;background-size:0% 100%;animation:serr-wait var(--serr-wait,60s) linear forwards}
+@keyframes serr-wait{to{background-size:100% 100%}}
+@media(prefers-reduced-motion:reduce){.serr__try--rate[aria-disabled="true"]{animation:none;background-image:none}}
+
+/* ================= BODY ================= */
+/* Weight, dental aligners and future vitals. */
+
+/* ---------- weight card ---------- */
+.bread__k i{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:7px}
+.bax{display:flex;justify-content:space-between;gap:12px;margin-bottom:2px}
+.bax__bf{color:var(--d-gold)}
+/* lines the aligner axis label up with the weight chart beside it */
+@media(min-width:760px){.bax--al{margin-top:33px}}
+.btray{display:grid;grid-template-columns:repeat(2,minmax(0,auto));justify-content:start;gap:2px 34px}
+
+/* ---------- weight chart ---------- */
+.bpane[data-pane="bw"]{user-select:none}
+.btick{font-family:var(--body)}
+.btick--bf{fill:var(--d-gold)}
+.bavg{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.bobs{fill:var(--accent);opacity:.6}
+.bbfm{fill:var(--d-gold)}
+.bbfl{fill:none;stroke:var(--d-gold);stroke-width:1;stroke-dasharray:2 3;opacity:.45}
+.bcur{stroke:var(--accent);stroke-width:1;opacity:.4}
+.bring{fill:none;stroke:var(--accent);stroke-width:2}
+.bhov[hidden],.bring[hidden]{display:none}
+
+/* ---------- aligners ---------- */
+.whead__l .dotin{display:inline-block;width:9px;height:9px;border-radius:var(--r-pill);background:var(--d-green);margin-right:9px;vertical-align:2px}
+/* the header dot turns red while the aligners are out of the mouth */
+.whead__l .dotin--out{background:var(--d-red)}
+.alwrap{position:relative}
+.alrows{display:grid;gap:5px}
+.alr,.alscale{display:grid;grid-template-columns:88px minmax(0,1fr) 74px;gap:9px;align-items:center}
+.alscale{margin-top:6px}
+.alscale>div:nth-child(2){display:flex;justify-content:space-between}
+.alr__t{position:relative;height:18px;border-radius:var(--r-sm);background:var(--d-green);border:1px solid var(--edge);overflow:hidden;cursor:crosshair}
+/* a day with no logged events is not a day worn — it reads as blank, not green */
+.alr__o{position:absolute;top:0;bottom:0;background:var(--d-grey)}
+.alr__o--long{background:var(--d-red)}
+/* the stretch of a day outside tracking: before treatment started, or tonight */
+.alr__f{position:absolute;top:0;bottom:0;background:var(--edge)}
+.alr__v--under{color:var(--alert)}
+.alr__v--q{color:var(--muted);font-weight:500}
+.alchg{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin:8px 0 6px;padding:8px 10px;border-radius:var(--r-sm);background:var(--accent-soft)}
+.alchg__b{font-family:var(--display);font-weight:700;font-size:12.5px;color:var(--accent)}
+.alchg__x{font-size:12px;color:var(--soft)}
+.alchg__x b{font-weight:600;color:var(--text)}
+@media(max-width:600px){.alr,.alscale{grid-template-columns:60px minmax(0,1fr) 62px;gap:8px}}
+
+/* ---------- others ---------- */
+.bfutgrid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+@media(max-width:520px){.bfutgrid{grid-template-columns:1fr}}
+.bfutcard{border:1px dashed var(--edge);border-radius:var(--r-md);padding:16px 18px;background:var(--surface-alt);display:flex;flex-direction:column;gap:8px;min-height:132px}
+.bfutcard__row{display:flex;align-items:center;gap:8px 11px;flex-wrap:wrap}
+.bfutcard__v{font-family:var(--display);font-weight:700;font-size:26px;line-height:1;color:var(--muted);opacity:.55}
+.bfut__x{font-size:12.5px;color:var(--muted)}
+
+/* ================= FUEL ================= */
+/* Macro summary, food log, eating and fasting. */
+
+/* macro summary */
+.favgl__k{margin-bottom:14px}
+.fbarhead{margin-top:26px;padding-top:20px;border-top:1px dotted var(--rule)}
+.fhero{display:grid;gap:20px 30px;grid-template-columns:repeat(3,minmax(0,1fr));margin-bottom:4px}
+.fhero>div+div{padding-left:26px;border-left:1px dotted var(--rule)}
+@media(max-width:760px){.fhero{grid-template-columns:1fr}
+.fhero>div+div{padding-left:0;border-left:0;border-top:1px dotted var(--rule);padding-top:16px}}
+.fkey{display:flex;align-items:center;gap:8px}
+.fkey i{width:8px;height:8px;border-radius:2px;flex:none}
+.fval{margin-top:9px}
+.fval--sm small{font-size:11.5px}
+.fsub{margin-top:8px;font-size:12px;color:var(--soft);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.fsc{position:relative;height:9px;border-radius:var(--r-pill);background:var(--edge);margin-top:12px;overflow:hidden}
+.fsc__band{position:absolute;top:0;bottom:0;background:var(--accent-soft)}
+.fsc__f{position:absolute;top:2px;bottom:2px;left:2px;border-radius:var(--r-pill);opacity:.85}
+.fsc__tick{position:absolute;top:0;bottom:0;width:2px;background:var(--accent)}
+.fquiet{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:13px 22px;margin-top:20px;padding-top:16px;border-top:1px dotted var(--rule)}
+
+/* bars by day */
+.ftgt{fill:var(--accent-soft)}
+.fdbar{opacity:.92;cursor:crosshair}
+.fdbar--part{opacity:.38}
+.fdlab{font-family:var(--display);font-size:12px;font-weight:700;fill:var(--text)}
+.fdlab--sm{font-size:10px}
+.fdx{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.08em;fill:var(--muted)}
+.fdx2{font-family:var(--body);font-size:11px;font-weight:500;fill:var(--soft)}
+.fdx--now{fill:var(--accent)}
+.favgl{stroke-width:1.4;stroke-dasharray:5 4;opacity:.9}
+.fdavg{font-family:var(--body);font-size:10px;font-weight:700}
+
+/* eating and fasting */
+.flwrap{position:relative}
+.flrows{display:grid;gap:5px}
+/* 116px so a night that crosses a month ("WED 30 Sept\2013 1 Oct") still fits */
+.flr,.flscale{display:grid;grid-template-columns:116px minmax(0,1fr) 68px 96px;gap:10px;align-items:center}
+.flscale{margin-top:6px}
+.flscale--h{margin:0 0 7px;text-align:right}
+.flscale--h>div{line-height:1.35}
+.flsc{display:flex;justify-content:space-between}
+.flr__t{position:relative;height:20px;border-radius:var(--r-sm);background:var(--surface-alt);border:1px solid var(--edge)}
+/* a night we cannot measure: an outline rather than a fill, because a fill would
+   read as a night that has data */
+.flr__t--none{background:transparent;border:1px dashed var(--rule)}
+.flbar{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--fast-fill);box-shadow:inset 0 0 0 1px var(--accent)}
+/* a fast that runs past noon is cut into two pieces that fit together like a joint:
+   an arrow where it was cut, a matching notch where it resumes a row above */
+.flbar--cut{min-width:10px;border-radius:4px 0 0 4px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%)}
+.flbar--carry{min-width:10px;border-radius:0 4px 4px 0;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,7px 50%)}
+.flbar--on{background:color-mix(in oklch,var(--accent) 55%,transparent)}
+.flq{color:var(--muted)}
+.flh--sm{display:none}
+.flsw-wrap{width:14px;border-radius:0;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 50%,calc(100% - 5px) 100%,0 100%)}
+.flsc span{white-space:nowrap}
+.flslp{position:absolute;top:6px;height:8px;background:var(--accent-dk);border-radius:2px;opacity:.85}
+@media(max-width:600px){.flr,.flscale{grid-template-columns:64px minmax(0,1fr) 54px 54px;gap:8px}
+/* the weekday is already hidden here; the date splits at its own break instead */
+.flr__dp{display:block;line-height:1.25}
+.flh--lg{display:none}
+.flh--sm{display:inline}
+.flsc span:nth-child(even){display:none}}
+
+/* meals table: header solid --edge · rows dotted · total solid --edge-strong */
+.mscroll{overflow-x:auto;max-width:100%;scrollbar-width:thin}
+.mtable{width:100%;border-collapse:collapse}
+.mtable thead th{text-align:right;padding:0 0 11px;border-bottom:1px solid var(--edge);white-space:nowrap}
+.mtable thead th.l{text-align:left}
+.mtable .thm{display:inline-flex;align-items:center;gap:5px;justify-content:flex-end}
+.mtable .thm i{width:7px;height:7px;border-radius:2px}
+.mtable th:not(.l),.mtable td:not(.meal):not(.items){padding-left:11px}
+.mtable tbody td{padding:11px 0;border-bottom:1px dotted var(--rule);font-size:13.5px;font-weight:500;color:var(--text);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mtable td.meal{text-align:left;font-family:var(--display);font-weight:700;font-size:13.5px}
+.mtable td.items{text-align:left;font-size:12.5px;color:var(--soft);white-space:normal;line-height:1.45;padding:11px 12px}
+.mtable td.cal{font-weight:600}
+.mtable tfoot td{padding:13px 0 0;border-top:1px solid var(--edge-strong);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mtable tfoot td small{font-size:11.5px;font-weight:500;color:var(--muted)}
+.mtable tfoot td.tot{text-align:left;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft)}
+@media(max-width:760px){.mtable .items,.mtable td.items{display:none}}
+
+/* ================= RESOURCES ================= */
+
+/* Two categories the design has no colour for: `fitness` and `one-off`, both
+   one-off-bucket. Every other palette hue is taken — plum and red are the fixed-cost
+   colours, so the ring would collide if these reused them. Hues chosen from the two
+   gaps in the scale (olive ~100deg, rose ~340deg). */
+.rscope{padding-top:18px;border-top:1px dotted var(--rule)}
+.rscope .brng{margin-bottom:0}
+.rscope .brng--wrap{flex-wrap:nowrap;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.rempty{font-size:13.5px;color:var(--soft);line-height:1.6;max-width:62ch;text-wrap:pretty;margin-top:18px}
+.dhero{display:grid;gap:26px;margin-top:18px}
+@media(min-width:820px){.dhero{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.dhero__r{padding-top:20px;border-top:1px dotted var(--rule)}
+@media(min-width:820px){.dhero__r{padding:0 0 0 26px;border-top:0;border-left:1px dotted var(--rule)}}
+.dhero__eq{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:16px;font-size:13.5px;font-weight:600}
+.dhero__eq i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px}
+.dsw--day{background:var(--accent)}
+.dsw--fixed{background:var(--muted)}
+.dsw--oneoff{background:var(--c-tan)}
+.dplus{color:var(--muted);font-weight:400}
+.done__v{margin:10px 0 14px;font-variant-numeric:proportional-nums}
+.done__v--q{color:var(--muted)}
+.ritem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:7px 0;font-size:13.5px;border-bottom:1px dotted var(--rule)}
+.ritem:last-child{border-bottom:0}
+.ritem span:last-child{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ritem em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45}
+.ritem--due{color:var(--muted)}
+.ritem--due span:last-child{font-weight:500;font-size:12px}
+.ritem--hd span:first-child{font-family:var(--display);font-weight:700;font-size:14px}
+.ritem--hd span:last-child{font-size:14px}
+.fxg{padding:4px 0 10px;border-bottom:1px dotted var(--rule)}
+.fxg:last-child{border-bottom:0;padding-bottom:0}
+.fxsub{margin:8px 0 2px}
+.fxk{margin-bottom:3px}
+.fxi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:4px 0 4px 14px;font-size:12.5px;color:var(--soft)}
+.fxi span:last-child{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.fxb{display:inline-block;margin-left:9px;padding:2px 8px;border-radius:var(--r-pill);background:var(--surface-alt);border:1px solid var(--edge);font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+.fxf{margin-top:9px;font-size:12px;font-style:italic;color:var(--muted);line-height:1.5}
+.sdon{display:grid;gap:22px 34px;align-items:start;padding:20px 0 6px;margin-bottom:10px}
+@media(min-width:800px){.sdon{grid-template-columns:auto minmax(0,1fr)}}
+.sdon__l{display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:6px}
+.rdonut{position:relative;flex:none}
+.rdonut svg{display:block;transform:rotate(-90deg)}
+.dseg{transition:opacity .12s}
+.card.is-dim .dseg:not(.is-on),.card.is-dim .rcat:not(.is-on){opacity:.32}
+.rcat.is-on{background:var(--accent-soft);border-radius:var(--r-sm)}
+.rdonut__c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.rdonut__k{font-size:10px}
+.rdonut__v{margin-top:3px;font-variant-numeric:proportional-nums}
+.rdonut__n{font-size:11px;color:var(--muted);margin-top:2px}
+.rcat{display:grid;grid-template-columns:11px minmax(0,1fr) auto auto;gap:11px;align-items:center;padding:9px 0;border-bottom:1px dotted var(--rule)}
+.rcat:last-child{border-bottom:0}
+.rcat__d{width:11px;height:11px;border-radius:3px}
+.rcat__n{font-size:13.5px;font-weight:600}
+.rcat__p{font-size:12px;color:var(--muted);min-width:3.6em;text-align:right;font-variant-numeric:tabular-nums}
+.rcat__v{font-size:13.5px;font-weight:600;min-width:5.2em;text-align:right;font-variant-numeric:tabular-nums}
+.cst__r{display:block;padding:13px 0;border-bottom:1px dotted var(--rule)}
+.cst__b{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:baseline;width:100%;padding:0;background:none;border:0;text-align:left;color:inherit;font-family:inherit}
+button.cst__b{cursor:pointer}
+button.cst__b:hover .rcar{border-color:var(--accent)}
+.cst__n{font-family:var(--display);font-weight:700;font-size:15px}
+.cst__n em{display:block;font-family:var(--body);font-style:normal;font-weight:400;font-size:12px;color:var(--muted);margin-top:3px}
+.cst__v{font-size:16px;font-weight:600;font-variant-numeric:tabular-nums}
+.cst__r--tot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:baseline;border-bottom:0;border-top:1px solid var(--edge-strong);margin-top:2px}
+.rcar{display:inline-block;width:16px;height:16px;line-height:14px;text-align:center;border:1px solid var(--edge);border-radius:var(--r-sm);font-family:var(--body);font-style:normal;font-size:11px;font-weight:700;color:var(--accent);margin-left:9px;vertical-align:2px}
+.cst__r .rdrawer{padding:12px 0 4px}
+.ctop{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 18px;margin:16px 0 14px}
+.bpanwrap--l{margin:6px 0 0}
+.bpanwrap--l .bpan{gap:4px}
+/* ledger: header solid --edge · rows dotted · [page] day-group start solid --edge · total solid --edge-strong */
+.ctbl{border-top:1px dotted var(--rule)}
+.ctr{display:grid;grid-template-columns:92px minmax(0,1.1fr) minmax(0,1.5fr) 118px 88px;gap:12px;align-items:baseline;padding:9px 0;border-bottom:1px dotted var(--rule);font-size:13.5px}
+.ctr--h{border-bottom:1px solid var(--edge)}
+.ctr--h span:last-child,.ctr__a{text-align:right}
+.ctr--first{border-top:1px solid var(--edge);margin-top:-1px}
+.ctr--tot{border-bottom:0;border-top:1px solid var(--edge-strong);padding-top:12px;font-weight:600}
+.ctr--tot span:nth-child(2){font-family:var(--display);font-weight:700;font-size:14px}
+.ctr--tot span:nth-child(4){font-size:12px;color:var(--muted);font-weight:500}
+.ctr--tot .ctr__a{font-size:15px;font-weight:700}
+.ctr__d{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.ctr__d b{font-weight:600;color:var(--soft)}
+.ctr__m{font-weight:600}
+.ctr__s{color:var(--soft);font-size:12.5px}
+.ctr__c{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--soft)}
+.ctr__c i{width:8px;height:8px;border-radius:2px;flex:none}
+.ctr__a{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:860px){.ctr{grid-template-columns:78px minmax(0,1fr) auto 84px;gap:10px}
+.ctr__s,.ctr--h span:nth-child(3),.ctr--tot span:nth-child(3){display:none}}
+@media(max-width:520px){.ctr{grid-template-columns:64px minmax(0,1fr) 80px}
+.ctr--h span:nth-child(4){display:none}
+.ctr__c{grid-column:2;grid-row:2}
+.ctr__a{grid-column:3;grid-row:1}
+.ctr--tot span:nth-child(4){grid-column:2;grid-row:2}}
+.notes{display:grid;grid-template-columns:1fr;gap:26px 44px}
+@media(min-width:700px){.notes{grid-template-columns:1fr 1fr}}
+.note__h{font-family:var(--display);font-weight:700;font-size:14.5px}
+.note__b{font-size:13.5px;color:var(--soft);margin-top:6px;line-height:1.6;text-wrap:pretty}
+.note__b a,.nlead a{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.note__b .tsoon,.nlead .tsoon{margin-left:6px}
+.nlead{font-size:13.5px;color:var(--soft);margin:-6px 0 24px}
+
+/* A real grocery bill runs to 400+ characters. Clamp to two lines so one row cannot
+   be six times its neighbours; the full string stays in the cell's title attribute.
+   Scoped to the width where the Item column exists at all — below 860px it is
+   hidden, and an unscoped
+   display here would override that. */
+@media(min-width:861px){
+.ctr__s{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+}
+/* Some rows have no merchant recorded; the em dash keeps the column aligned. */
+.ctr__m--q{color:var(--muted);font-weight:500}
+
+/* ================= STATUS · SKELETON =================
+   Loading state for Today · Body · Fuel · Resources. Static HTML + CSS, no JS.
+   Lift this whole block into main.css AFTER the STATUS rules (it relies on source order).
+   The skeleton markup reuses the live layout classes (.card, .whead, .tsheet, .tcl, .ctr …);
+   these rules only paint grey blocks inside them, so every box keeps its live size.
+   ====================================================== */
+
+
+/* panel scope: <section class="panel sk" aria-busy="true"> — remove .sk + aria-busy when the data lands */
+.sk{cursor:progress;-webkit-user-select:none;user-select:none}
+.sk__sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.sk--on-accent{--sk-fill:var(--sk-fill-on);--sk-glint:var(--sk-glint-on)}
+
+/* text line — exactly one line box of its host (1lh), grey bar centred in it; segments separated by spaces wrap like words */
+.sk__line{display:inline-block;vertical-align:top;position:relative;width:var(--sk-w,100%);max-width:100%;height:1.5em;height:1lh}
+.sk__line::before{content:"";position:absolute;left:0;right:0;top:50%;height:.62em;margin-top:-.31em;border-radius:.2em}
+/* big-number readout — sits on the baseline at cap height, inside a live readout host (.tcl__v, .fval, .bread__v, .hero-amt …) */
+.sk__num{display:inline-block;vertical-align:baseline;width:var(--sk-w,3em);max-width:100%;height:.72em;border-radius:.12em}
+/* bar — standalone progress / track */
+/* fill — paints a live element grey and keeps its geometry (progress tracks, timeline rows, dots, swatches) */
+/* chip — turns a live pill or segmented control grey; its label stays as invisible text so the width is exact */
+.sk .sk__chip,.sk .sk__chip *{color:transparent;border-color:transparent}
+.sk .sk__chip *{background:none}
+/* icon — reserves the footprint of a pan chevron button */
+.sk__icon{display:inline-block;flex:none;width:var(--sk-s,29px);height:var(--sk-s,29px)}
+/* chart area — static gridlines at the chart's live height */
+.sk__chart{display:block;height:var(--sk-h,240px);background:repeating-linear-gradient(to bottom,transparent 0 calc(25% - 1px),var(--c-gridline) calc(25% - 1px) 25%)}
+/* ring — donut placeholder, fills its live .rdonut box */
+.sk__ring{display:block;width:100%;height:100%;border-radius:50%;-webkit-mask:radial-gradient(closest-side,transparent calc(100% - var(--sk-t,28px)),#000 calc(100% - var(--sk-t,28px) + .5px));mask:radial-gradient(closest-side,transparent calc(100% - var(--sk-t,28px)),#000 calc(100% - var(--sk-t,28px) + .5px))}
+
+/* paint + motion: one soft band, fixed to the viewport so every block shares the same slow pass.
+   Only background-position animates (no layout, no shadow). */
+.sk .sk__line::before,.sk .sk__num,.sk .sk__fill,.sk .sk__chip,.sk .sk__ring{background-color:var(--sk-fill);background-image:linear-gradient(100deg,transparent 30%,var(--sk-glint) 50%,transparent 70%);background-size:160vw 100%;background-attachment:fixed;animation:sk-sweep 3.6s linear infinite}
+@keyframes sk-sweep{from{background-position:0 0}to{background-position:160vw 0}}
+@media (prefers-reduced-motion:reduce){
+.sk .sk__line::before,.sk .sk__num,.sk .sk__fill,.sk .sk__chip,.sk .sk__ring{animation:none;background-image:none}}
+/* ================= /STATUS · SKELETON ================= */

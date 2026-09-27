@@ -422,4 +422,56 @@
 		syncTinyMCE();
 		clearSnapshotFromLocalStorage();
 	} );
+
+	/**
+	 * Links open in a new tab by default.
+	 *
+	 * WordPress leaves the checkbox at whatever it was last set to, so a new
+	 * link is ticked here. An existing link keeps its own setting: by the time
+	 * wplink-open fires, wpLink.refresh() has already read the link's target,
+	 * and it labels the button Update rather than Save.
+	 */
+	function isNewLink() {
+		var labels = window.wpLinkL10n;
+		var $submit = $( '#wp-link-submit' );
+
+		if ( ! $submit.length || ! labels ) {
+			return false;
+		}
+
+		return $submit.val() === labels.save;
+	}
+
+	function syncNewTabNote() {
+		var $note = $( '#awhitepen-link-newtab' );
+
+		if ( $note.length ) {
+			$note.toggle( $( '#wp-link-target' ).prop( 'checked' ) );
+		}
+	}
+
+	$( document ).on( 'wplink-open', function() {
+		var $target = $( '#wp-link-target' );
+
+		if ( ! $target.length ) {
+			return;
+		}
+
+		if ( isNewLink() ) {
+			$target.prop( 'checked', true );
+		}
+
+		// Says so under the address, so Options never has to be opened to check.
+		if ( ! $( '#awhitepen-link-newtab' ).length ) {
+			$( '<p/>', {
+				id: 'awhitepen-link-newtab',
+				'class': 'awhitepen-link-newtab',
+				html: '<span aria-hidden="true">&#8599;</span> Opens in a new tab'
+			} ).insertAfter( '#wp-link-wrap .wp-link-input' );
+		}
+
+		syncNewTabNote();
+	} );
+
+	$( document ).on( 'change', '#wp-link-target', syncNewTabNote );
 }( window.jQuery ) );

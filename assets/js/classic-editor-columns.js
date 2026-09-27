@@ -93,7 +93,69 @@ tinymce.PluginManager.add( 'awhitepen_columns', function( editor ) {
 		],
 	} );
 
+	/**
+	 * Turn the preview back into its shortcode.
+	 *
+	 * The editor shows columns as real markup so they can be typed into. What
+	 * gets saved is the shortcode, so the post stores something readable in the
+	 * Text tab rather than the editor's own scaffolding.
+	 */
+	function previewToShortcodes( content ) {
+		var wrapper = document.createElement( 'div' );
+		var shortcodes = [];
+		var previews;
+		var i;
+		var html;
+
+		if ( ! content || content.indexOf( 'awhitepen-columns--preview' ) === -1 ) {
+			return content;
+		}
+
+		wrapper.innerHTML = content;
+		previews = wrapper.querySelectorAll( '.awhitepen-columns--preview' );
+
+		for ( i = 0; i < previews.length; i += 1 ) {
+			( function( preview, index ) {
+				var name = preview.getAttribute( 'data-awhitepen-shortcode' ) || 'two_col';
+				var columns = preview.children;
+				var parts = [];
+				var marker = document.createElement( 'div' );
+				var j;
+
+				for ( j = 0; j < columns.length; j += 1 ) {
+					parts.push( trimContent( columns[ j ].innerHTML ) );
+				}
+
+				shortcodes[ index ] =
+					'[' + name + ']\n\n' +
+					parts.join( '\n\n[column]\n\n' ) +
+					'\n\n[/' + name + ']';
+
+				// A marker, not the shortcode text: writing the text here would
+				// be escaped on serialisation, and un-escaping afterwards would
+				// also damage entities elsewhere in the post.
+				marker.setAttribute( 'data-awhitepen-col', String( index ) );
+				preview.parentNode.replaceChild( marker, preview );
+			}( previews[ i ], i ) );
+		}
+
+		html = wrapper.innerHTML;
+
+		for ( i = 0; i < shortcodes.length; i += 1 ) {
+			html = html.replace(
+				new RegExp( '<div data-awhitepen-col="' + i + '"><\\/div>' ),
+				shortcodes[ i ]
+			);
+		}
+
+		return html;
+	}
+
 	editor.on( 'BeforeSetContent', function( event ) {
 		event.content = shortcodesToPreview( event.content );
+	} );
+
+	editor.on( 'GetContent', function( event ) {
+		event.content = previewToShortcodes( event.content );
 	} );
 } );

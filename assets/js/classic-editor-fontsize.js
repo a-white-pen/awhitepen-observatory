@@ -1,73 +1,102 @@
-tinymce.PluginManager.add('awhitepen_fontsize', function(editor) {
-	function sanitizeSize(value) {
-		var size = parseFloat(value);
-		if (!size || isNaN(size)) {
-			return null;
-		}
-		return Math.max(8, Math.min(96, size));
+/**
+ * One Size control.
+ *
+ * The named sizes write a class, so they follow the post's own type scale and
+ * shrink on a phone. Only Custom px writes a fixed pixel value.
+ */
+tinymce.PluginManager.add('awhitepen_fontsize', function (editor) {
+	var SIZES = [
+		{ key: 'xsmall', text: 'Very small', hint: '12.5px', className: 'fs-xsmall' },
+		{ key: 'small', text: 'Small', hint: '15px', className: 'fs-small' },
+		{ key: 'body', text: 'Body', hint: '19px', className: '' },
+		{ key: 'large', text: 'Large', hint: '21px', className: 'fs-large' },
+		{ key: 'xlarge', text: 'Very large', hint: '24px', className: 'fs-xlarge' }
+	];
+
+	editor.on('init', function () {
+		SIZES.forEach(function (size) {
+			if (size.className) {
+				editor.formatter.register('awhitepen_' + size.key, {
+					inline: 'span',
+					classes: size.className
+				});
+			}
+		});
+	});
+
+	// Clears the named sizes and the inline pixel sizes left by the old toolbar.
+	function clearSize() {
+		SIZES.forEach(function (size) {
+			if (size.className) {
+				editor.formatter.remove('awhitepen_' + size.key, null, null, true);
+			}
+		});
+		editor.formatter.remove('fontsize', null, null, true);
 	}
 
-	function applyPxSize(rawSize) {
-		var size = sanitizeSize(rawSize);
-		if (!size) {
+	function applyNamed(size) {
+		editor.undoManager.transact(function () {
+			clearSize();
+
+			if (size.className) {
+				editor.formatter.apply('awhitepen_' + size.key);
+			}
+
+			editor.nodeChanged();
+		});
+	}
+
+	function applyCustom(rawSize) {
+		var size = parseFloat(rawSize);
+
+		if (!size || isNaN(size)) {
 			return;
 		}
 
-		editor.undoManager.transact(function() {
-			// Use TinyMCE's native inline font-size behavior so highlighted text can be styled
-			// without forcing the entire paragraph/list block to resize.
+		size = Math.max(8, Math.min(96, size));
+
+		editor.undoManager.transact(function () {
+			clearSize();
 			editor.execCommand('FontSize', false, size + 'px');
 			editor.nodeChanged();
 		});
 	}
 
 	function promptCustomSize() {
-		var value = window.prompt('Enter font size in px (e.g. 17):', '');
-		if (value === null) {
-			return;
-		}
-		applyPxSize(value);
+		editor.windowManager.open({
+			title: 'Custom size',
+			body: [
+				{
+					type: 'textbox',
+					name: 'size',
+					label: 'Size',
+					value: '',
+					tooltip: 'Whole or half pixels, e.g. 17 or 16.5'
+				}
+			],
+			onsubmit: function (event) {
+				applyCustom(event.data.size);
+			}
+		});
 	}
 
-	editor.addButton('awhitepen_fontsize_named', {
-		type: 'menubutton',
-		text: 'Font Size',
-		icon: false,
-		menu: [
-			{
-				text: 'Very small',
-				onclick: function() {
-					applyPxSize(14);
-				}
-			},
-			{
-				text: 'Small',
-				onclick: function() {
-					applyPxSize(15);
-				}
-			},
-			{
-				text: 'Regular',
-				onclick: function() {
-					applyPxSize(18);
-				}
-			},
-			{
-				text: 'Large',
-				onclick: function() {
-					applyPxSize(20);
-				}
-			},
-			{
-				text: 'Very large',
-				onclick: function() {
-					applyPxSize(24);
-				}
-			},
-			{
-				text: 'Set custom px...',
-				onclick: promptCustomSize
+	var menu = SIZES.map(function (size) {
+		return {
+			text: size.text,
+			shortcut: size.hint,
+			onclick: function () {
+				applyNamed(size);
 			}
-		]
+		};
+	});
+
+	menu.push({ text: '-' });
+	menu.push({ text: 'Custom px…', onclick: promptCustomSize });
+
+	editor.addButton('awhitepen_fontsize', {
+		type: 'menubutton',
+		text: 'Size',
+		icon: false,
+		menu: menu
 	});
 });

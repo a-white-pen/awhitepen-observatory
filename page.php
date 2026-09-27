@@ -8,7 +8,7 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main">
+<main class="site-main">
 	<div class="site-shell">
 		<?php
 		while ( have_posts() ) :
@@ -33,26 +33,15 @@ get_header();
 				$intro_markup = esc_html( $page_context['intro'] );
 			}
 			?>
-			<article id="post-<?php the_ID(); ?>" <?php post_class( 'page-entry' ); ?>>
-				<header class="content-column entry-hero entry-hero--page">
-					<p class="section-kicker"><?php echo esc_html( $page_context['eyebrow'] ); ?></p>
-					<h1 class="entry-title"><?php the_title(); ?></h1>
-					<?php if ( '' !== $intro_markup ) : ?>
-						<p class="entry-dek"><?php echo $intro_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-					<?php endif; ?>
-				</header>
+			<article class="page">
+				<p class="page__eyebrow"><?php echo esc_html( $page_context['eyebrow'] ); ?></p>
+				<h1 class="page-title"><?php the_title(); ?></h1>
+				<?php if ( '' !== $intro_markup ) : ?>
+					<p class="page__dek"><?php echo $intro_markup; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+				<?php endif; ?>
 
-				<div class="content-column entry-content">
-					<?php
-					the_content();
-
-					wp_link_pages(
-						array(
-							'before' => '<nav class="page-links" aria-label="' . esc_attr__( 'Page', 'awhitepen' ) . '">',
-							'after'  => '</nav>',
-						)
-					);
-					?>
+				<div class="entry">
+					<?php the_content(); ?>
 				</div>
 			</article>
 		<?php endwhile; ?>

@@ -69,7 +69,6 @@ $footer_social_rows = awhitepen_footer_social_rows();
 				</div>
 			</div>
 		</footer>
-	</div>
 <?php wp_footer(); ?>
 </body>
 </html>
