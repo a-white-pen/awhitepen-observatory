@@ -11,6 +11,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 get_header();
 ?>
 

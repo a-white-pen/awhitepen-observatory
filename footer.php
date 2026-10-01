@@ -5,6 +5,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 $footer_social_rows = awhitepen_footer_social_rows();
 ?>
 		<footer class="site-footer">

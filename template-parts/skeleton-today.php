@@ -9,6 +9,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 ?>
 <p class="sk__sr">Loading Today</p>
 <div class="tpres sk--on-accent" aria-hidden="true"><div class="tpres__h"><b class="sk__line" style="--sk-w:8.4em"></b></div><p class="tpres__sub"><b class="sk__line" style="--sk-w:2.6em"></b> <b class="sk__line" style="--sk-w:3.1em"></b> <b class="sk__line" style="--sk-w:2.6em"></b> <b class="sk__line" style="--sk-w:2.6em"></b> <b class="sk__line" style="--sk-w:3.6em"></b> <b class="sk__line" style="--sk-w:1.6em"></b></p><div class="tpres__row"><div><p class="tpres__ck"><b class="sk__line" style="--sk-w:17.2em"></b></p><p class="tpres__cv"><b class="sk__line" style="--sk-w:2.2em"></b></p></div><div><p class="tpres__ck"><b class="sk__line" style="--sk-w:6.2em"></b></p><p class="tpres__cv"><b class="sk__line" style="--sk-w:11em"></b></p></div><div><p class="tpres__ck"><b class="sk__line" style="--sk-w:7.8em"></b></p><p class="tpres__cv"><b class="sk__line" style="--sk-w:7.2em"></b></p></div></div></div>

@@ -5,6 +5,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 if ( ! defined( 'AWHITEPEN_VERSION' ) ) {
 	define( 'AWHITEPEN_VERSION', '1.0.0' );
 }

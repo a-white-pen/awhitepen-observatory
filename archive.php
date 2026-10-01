@@ -5,6 +5,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 get_header();
 
 // Categories have their own template; this covers tags, dates and authors.

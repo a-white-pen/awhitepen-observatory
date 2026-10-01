@@ -5,6 +5,10 @@
  * @package AWhitePen
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Loaded through WordPress, never on its own.
+}
+
 $search_field_id = wp_unique_id( 'search-field-' );
 $search_context  = isset( $args['context'] ) && is_string( $args['context'] ) ? $args['context'] : 'default';
 $search_classes  = 'search-form';
