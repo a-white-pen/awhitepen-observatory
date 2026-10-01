@@ -25,10 +25,10 @@ $footer_social_rows = awhitepen_footer_social_rows();
 							</div>
 						</article>
 
-						<article class="footer-embed-card footer-embed-card--strava">
+						<article class="footer-embed-card footer-embed-card--garmin">
 							<h2 class="footer-embed-card__title"><?php esc_html_e( 'Fitness', 'awhitepen' ); ?></h2>
-							<div class="footer-embed-card__frame footer-embed-card__frame--module" data-platform="strava">
-								<?php awhitepen_render_footer_strava_module(); ?>
+							<div class="footer-embed-card__frame footer-embed-card__frame--module" data-platform="garmin">
+								<?php awhitepen_render_footer_garmin_module(); ?>
 							</div>
 						</article>
 					</div>

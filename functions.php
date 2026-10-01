@@ -315,6 +315,10 @@ function awhitepen_asset_version( $relative_path ) {
 	return AWHITEPEN_VERSION;
 }
 
+function awhitepen_status_api_url( $endpoint ) {
+	return 'https://project-b-2t23se6ira-as.a.run.app/api/data-visualisation/' . $endpoint;
+}
+
 function awhitepen_enqueue_assets() {
 	wp_enqueue_style( 'awhitepen-fonts', awhitepen_google_fonts_url(), array(), null );
 
@@ -401,8 +405,6 @@ function awhitepen_enqueue_assets() {
 			)
 		);
 
-		$status_api = 'https://project-b-2t23se6ira-as.a.run.app/api/data-visualisation/';
-
 		// handle => [ endpoint, the name the failure card shows ].
 		$status_scripts = array(
 			'status'    => array( 'today', __( 'TODAY', 'awhitepen' ) ),
@@ -426,7 +428,7 @@ function awhitepen_enqueue_assets() {
 				'awhitepen-' . $name,
 				'awhitepen' . ucfirst( $name ),
 				array(
-					'url'   => $status_api . $script[0],
+					'url'   => awhitepen_status_api_url( $script[0] ),
 					'label' => $script[1],
 				)
 			);
@@ -1306,150 +1308,7 @@ function awhitepen_render_footer_mastodon_module() {
 	<?php
 }
 
-function awhitepen_get_strava_credentials() {
-	$client_id                = defined( 'STRAVA_CLIENT_ID' ) ? trim( (string) STRAVA_CLIENT_ID ) : '';
-	$client_secret            = defined( 'STRAVA_CLIENT_SECRET' ) ? trim( (string) STRAVA_CLIENT_SECRET ) : '';
-	$refresh_token_candidates = awhitepen_get_strava_refresh_token_candidates();
-	$refresh_token            = ! empty( $refresh_token_candidates ) ? $refresh_token_candidates[0]['value'] : '';
-
-	if ( '' === $client_id || '' === $client_secret || '' === $refresh_token ) {
-		return new WP_Error(
-			'awhitepen_strava_missing_credentials',
-			__( 'Strava credentials are not fully configured.', 'awhitepen' )
-		);
-	}
-
-	return array(
-		'client_id'                => $client_id,
-		'client_secret'            => $client_secret,
-		'refresh_token'            => $refresh_token,
-		'refresh_token_candidates' => $refresh_token_candidates,
-	);
-}
-
-function awhitepen_get_strava_refresh_token_candidates() {
-	$candidates           = array();
-	$stored_refresh_token = get_option( 'awhitepen_strava_refresh_token', '' );
-	$constant_token       = defined( 'STRAVA_REFRESH_TOKEN' ) ? trim( (string) STRAVA_REFRESH_TOKEN ) : '';
-
-	if ( is_string( $stored_refresh_token ) && '' !== trim( $stored_refresh_token ) ) {
-		$candidates[] = array(
-			'value'  => trim( $stored_refresh_token ),
-			'source' => 'stored option',
-		);
-	}
-
-	if ( '' !== $constant_token ) {
-		$existing_values = wp_list_pluck( $candidates, 'value' );
-
-		if ( ! in_array( $constant_token, $existing_values, true ) ) {
-			$candidates[] = array(
-				'value'  => $constant_token,
-				'source' => 'wp-config constant',
-			);
-		}
-	}
-
-	return $candidates;
-}
-
-function awhitepen_store_strava_refresh_token( $refresh_token ) {
-	$refresh_token = is_string( $refresh_token ) ? trim( $refresh_token ) : '';
-
-	if ( '' === $refresh_token ) {
-		return;
-	}
-
-	update_option( 'awhitepen_strava_refresh_token', $refresh_token, false );
-}
-
-function awhitepen_request_strava_access_token( $credentials, $refresh_token_candidate ) {
-	$response = wp_remote_post(
-		'https://www.strava.com/oauth/token',
-		array(
-			'timeout' => 15,
-			'body'    => array(
-				'client_id'     => $credentials['client_id'],
-				'client_secret' => $credentials['client_secret'],
-				'grant_type'    => 'refresh_token',
-				'refresh_token' => $refresh_token_candidate['value'],
-			),
-		)
-	);
-
-	if ( is_wp_error( $response ) ) {
-		return new WP_Error(
-			'awhitepen_strava_token_request_failed',
-			__( 'Unable to refresh the Strava access token.', 'awhitepen' ),
-			$response->get_error_message()
-		);
-	}
-
-	$response_code = (int) wp_remote_retrieve_response_code( $response );
-	$body          = json_decode( wp_remote_retrieve_body( $response ), true );
-
-	if ( 200 !== $response_code || ! is_array( $body ) || empty( $body['access_token'] ) ) {
-		return new WP_Error(
-			'awhitepen_strava_token_invalid_response',
-			__( 'Strava returned an invalid access token response.', 'awhitepen' ),
-			array(
-				'status' => $response_code,
-				'body'   => $body,
-			)
-		);
-	}
-
-	if ( ! empty( $body['refresh_token'] ) && is_string( $body['refresh_token'] ) ) {
-		awhitepen_store_strava_refresh_token( $body['refresh_token'] );
-	}
-
-	return $body;
-}
-
-function awhitepen_get_strava_access_token() {
-	$cached_access_token = get_transient( 'awhitepen_strava_access_token' );
-
-	if ( is_string( $cached_access_token ) && '' !== trim( $cached_access_token ) ) {
-		return trim( $cached_access_token );
-	}
-
-	$credentials = awhitepen_get_strava_credentials();
-
-	if ( is_wp_error( $credentials ) ) {
-		return $credentials;
-	}
-
-	$token_response = null;
-	$last_error     = null;
-
-	foreach ( $credentials['refresh_token_candidates'] as $refresh_token_candidate ) {
-		$token_response = awhitepen_request_strava_access_token( $credentials, $refresh_token_candidate );
-
-		if ( ! is_wp_error( $token_response ) ) {
-			break;
-		}
-
-		$last_error = $token_response;
-	}
-
-	if ( is_wp_error( $token_response ) ) {
-		return $last_error ? $last_error : $token_response;
-	}
-
-	$access_token = trim( (string) $token_response['access_token'] );
-	$expires_at   = isset( $token_response['expires_at'] ) ? (int) $token_response['expires_at'] : 0;
-	$cache_ttl    = HOUR_IN_SECONDS;
-
-	if ( $expires_at > time() ) {
-		$cache_ttl = max( MINUTE_IN_SECONDS, $expires_at - time() - ( 5 * MINUTE_IN_SECONDS ) );
-	}
-
-	set_transient( 'awhitepen_strava_access_token', $access_token, $cache_ttl );
-
-	return $access_token;
-}
-
-function awhitepen_format_strava_activity_type( $activity_type ) {
+function awhitepen_format_activity_type( $activity_type ) {
 	$activity_type = is_string( $activity_type ) ? trim( $activity_type ) : '';
 
 	if ( '' === $activity_type ) {
@@ -1462,7 +1321,7 @@ function awhitepen_format_strava_activity_type( $activity_type ) {
 	return trim( (string) $activity_type );
 }
 
-function awhitepen_is_strava_strength_activity( $activity_type ) {
+function awhitepen_is_strength_activity( $activity_type ) {
 	$activity_type = is_string( $activity_type ) ? strtolower( trim( $activity_type ) ) : '';
 
 	if ( '' === $activity_type ) {
@@ -1474,7 +1333,7 @@ function awhitepen_is_strava_strength_activity( $activity_type ) {
 	return in_array( $normalized_type, array( 'weighttraining', 'strengthtraining' ), true );
 }
 
-function awhitepen_format_strava_distance( $distance_metres ) {
+function awhitepen_format_activity_distance( $distance_metres ) {
 	$distance_kilometres = max( 0, (float) $distance_metres ) / 1000;
 
 	return sprintf(
@@ -1484,7 +1343,7 @@ function awhitepen_format_strava_distance( $distance_metres ) {
 	);
 }
 
-function awhitepen_format_strava_moving_time( $moving_time_seconds ) {
+function awhitepen_format_activity_moving_time( $moving_time_seconds ) {
 	$moving_time_seconds = max( 0, (int) $moving_time_seconds );
 
 	if ( 0 === $moving_time_seconds ) {
@@ -1518,31 +1377,25 @@ function awhitepen_format_strava_moving_time( $moving_time_seconds ) {
 	);
 }
 
-function awhitepen_format_strava_activity_timestamp( $activity ) {
-	if ( ! is_array( $activity ) ) {
-		return '';
-	}
-
-	$date_string = '';
-
-	if ( ! empty( $activity['start_date_local'] ) && is_string( $activity['start_date_local'] ) ) {
-		$date_string = trim( $activity['start_date_local'] );
-	} elseif ( ! empty( $activity['start_date'] ) && is_string( $activity['start_date'] ) ) {
-		$date_string = trim( $activity['start_date'] );
-	}
-
-	if ( '' === $date_string ) {
+function awhitepen_format_activity_timestamp( $activity ) {
+	if ( ! is_array( $activity ) || empty( $activity['started_at'] ) || ! is_string( $activity['started_at'] ) ) {
 		return '';
 	}
 
 	try {
-		$date = new DateTimeImmutable( $date_string );
+		$date = new DateTimeImmutable( trim( $activity['started_at'] ) );
 	} catch ( Exception $exception ) {
 		return '';
 	}
 
-	$date_label = wp_date( 'M j', $date->getTimestamp(), $date->getTimezone() );
-	$time_label = strtolower( wp_date( 'g:i a', $date->getTimestamp(), $date->getTimezone() ) );
+	try {
+		$timezone = new DateTimeZone( ! empty( $activity['timezone'] ) ? (string) $activity['timezone'] : 'UTC' );
+	} catch ( Exception $exception ) {
+		$timezone = new DateTimeZone( 'UTC' );
+	}
+
+	$date_label = wp_date( 'M j', $date->getTimestamp(), $timezone );
+	$time_label = strtolower( wp_date( 'g:i a', $date->getTimestamp(), $timezone ) );
 
 	return sprintf(
 		/* translators: 1: activity date, 2: activity time. */
@@ -1552,147 +1405,27 @@ function awhitepen_format_strava_activity_timestamp( $activity ) {
 	);
 }
 
-function awhitepen_get_strava_activity_detail_items( $activity ) {
+function awhitepen_get_activity_detail_items( $activity ) {
 	if ( ! is_array( $activity ) ) {
 		return array();
 	}
 
-	$activity_type = ! empty( $activity['sport_type'] ) ? $activity['sport_type'] : ( ! empty( $activity['type'] ) ? $activity['type'] : '' );
+	$activity_type = ! empty( $activity['sport_type'] ) ? $activity['sport_type'] : '';
 	$detail_items  = array(
-		awhitepen_format_strava_activity_type( $activity_type ),
+		awhitepen_format_activity_type( $activity_type ),
 	);
 
-	if ( ! awhitepen_is_strava_strength_activity( $activity_type ) ) {
-		$detail_items[] = awhitepen_format_strava_distance( isset( $activity['distance'] ) ? $activity['distance'] : 0 );
+	if ( ! awhitepen_is_strength_activity( $activity_type ) ) {
+		$detail_items[] = awhitepen_format_activity_distance( isset( $activity['distance_m'] ) ? $activity['distance_m'] : 0 );
 	}
 
-	$detail_items[] = awhitepen_format_strava_moving_time( isset( $activity['moving_time'] ) ? $activity['moving_time'] : 0 );
+	$detail_items[] = awhitepen_format_activity_moving_time( isset( $activity['moving_seconds'] ) ? $activity['moving_seconds'] : 0 );
 
 	return array_values( array_filter( $detail_items ) );
 }
 
-function awhitepen_strava_api_get_json( $path, $access_token = '', $allow_retry = true ) {
-	$access_token = is_string( $access_token ) ? trim( $access_token ) : '';
-
-	if ( '' === $access_token ) {
-		$access_token = awhitepen_get_strava_access_token();
-
-		if ( is_wp_error( $access_token ) ) {
-			return $access_token;
-		}
-	}
-
-	$response = wp_remote_get(
-		'https://www.strava.com' . $path,
-		array(
-			'timeout' => 15,
-			'headers' => array(
-				'Authorization' => 'Bearer ' . $access_token,
-				'Accept'        => 'application/json',
-			),
-		)
-	);
-
-	if ( is_wp_error( $response ) ) {
-		return new WP_Error(
-			'awhitepen_strava_request_failed',
-			__( 'Unable to load data from Strava.', 'awhitepen' ),
-			$response->get_error_message()
-		);
-	}
-
-	$response_code = (int) wp_remote_retrieve_response_code( $response );
-	$body          = json_decode( wp_remote_retrieve_body( $response ), true );
-
-	if ( 401 === $response_code && $allow_retry ) {
-		delete_transient( 'awhitepen_strava_access_token' );
-
-		return awhitepen_strava_api_get_json( $path, '', false );
-	}
-
-	if ( 200 !== $response_code ) {
-		return new WP_Error(
-			'awhitepen_strava_invalid_response',
-			__( 'Strava returned an invalid response.', 'awhitepen' ),
-			array(
-				'status' => $response_code,
-				'body'   => $body,
-			)
-		);
-	}
-
-	return array(
-		'status' => $response_code,
-		'body'   => $body,
-	);
-}
-
-function awhitepen_extract_strava_activity_media_url( $activity ) {
-	if ( ! is_array( $activity ) || empty( $activity['photos'] ) || ! is_array( $activity['photos'] ) ) {
-		return '';
-	}
-
-	$primary = isset( $activity['photos']['primary'] ) && is_array( $activity['photos']['primary'] ) ? $activity['photos']['primary'] : array();
-
-	if ( empty( $primary ) ) {
-		return '';
-	}
-
-	if ( ! empty( $primary['urls'] ) ) {
-		$urls = $primary['urls'];
-
-		if ( is_string( $urls ) && '' !== trim( $urls ) ) {
-			return trim( $urls );
-		}
-
-		if ( is_array( $urls ) ) {
-			foreach ( array( '600', '300', '100', '2800', '0', 'default' ) as $preferred_key ) {
-				if ( ! empty( $urls[ $preferred_key ] ) && is_string( $urls[ $preferred_key ] ) ) {
-					return trim( $urls[ $preferred_key ] );
-				}
-			}
-
-			foreach ( $urls as $candidate ) {
-				if ( is_string( $candidate ) && '' !== trim( $candidate ) ) {
-					return trim( $candidate );
-				}
-			}
-		}
-	}
-
-	if ( ! empty( $primary['url'] ) && is_string( $primary['url'] ) ) {
-		return trim( $primary['url'] );
-	}
-
-	return '';
-}
-
-function awhitepen_get_strava_activity_media_url( $activity, $access_token ) {
-	$media_url = awhitepen_extract_strava_activity_media_url( $activity );
-
-	if ( '' !== $media_url ) {
-		return $media_url;
-	}
-
-	if (
-		! is_array( $activity ) ||
-		empty( $activity['id'] ) ||
-		( empty( $activity['photo_count'] ) && empty( $activity['total_photo_count'] ) )
-	) {
-		return '';
-	}
-
-	$detail_response = awhitepen_strava_api_get_json( '/api/v3/activities/' . absint( $activity['id'] ), $access_token );
-
-	if ( is_wp_error( $detail_response ) || empty( $detail_response['body'] ) || ! is_array( $detail_response['body'] ) ) {
-		return '';
-	}
-
-	return awhitepen_extract_strava_activity_media_url( $detail_response['body'] );
-}
-
-function awhitepen_build_strava_footer_activity_item( $activity, $access_token ) {
-	if ( ! is_array( $activity ) || empty( $activity['id'] ) ) {
+function awhitepen_build_garmin_footer_activity_item( $activity ) {
+	if ( ! is_array( $activity ) || empty( $activity['url'] ) || ! is_string( $activity['url'] ) ) {
 		return array();
 	}
 
@@ -1700,59 +1433,48 @@ function awhitepen_build_strava_footer_activity_item( $activity, $access_token )
 
 	return array(
 		'title'        => $activity_title,
-		'detail_items' => awhitepen_get_strava_activity_detail_items( $activity ),
-		'timestamp'    => awhitepen_format_strava_activity_timestamp( $activity ),
-		'url'          => 'https://www.strava.com/activities/' . absint( $activity['id'] ),
-		'media_url'    => awhitepen_get_strava_activity_media_url( $activity, $access_token ),
+		'detail_items' => awhitepen_get_activity_detail_items( $activity ),
+		'timestamp'    => awhitepen_format_activity_timestamp( $activity ),
+		'url'          => $activity['url'],
+		'media_url'    => ! empty( $activity['media_url'] ) && is_string( $activity['media_url'] ) ? $activity['media_url'] : '',
 	);
 }
 
-function awhitepen_build_strava_footer_activity_data() {
-	$credentials = awhitepen_get_strava_credentials();
-	$eyebrow     = __( 'Strava', 'awhitepen' );
+function awhitepen_build_garmin_footer_activity_data() {
+	$eyebrow     = __( 'Garmin', 'awhitepen' );
+	$unavailable = awhitepen_footer_module_state_payload(
+		array(
+			'state'   => 'unavailable',
+			'eyebrow' => $eyebrow,
+			'title'   => __( 'The latest Garmin activities could not be loaded just now.', 'awhitepen' ),
+			'meta'    => __( 'Please try again shortly.', 'awhitepen' ),
+		)
+	);
 
-	if ( is_wp_error( $credentials ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'   => 'missing_credentials',
-				'eyebrow' => $eyebrow,
-				'title'   => __( 'Latest activity data will appear here once Strava is connected.', 'awhitepen' ),
-				'meta'    => __( 'Add the Strava constants in wp-config.php to enable this module.', 'awhitepen' ),
-			)
-		);
+	$response = wp_remote_get(
+		awhitepen_status_api_url( 'fitness' ),
+		array(
+			'timeout' => 15,
+			'headers' => array( 'Accept' => 'application/json' ),
+		)
+	);
+
+	if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+		return $unavailable;
 	}
 
-	$access_token = awhitepen_get_strava_access_token();
+	$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
-	if ( is_wp_error( $access_token ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'   => 'unavailable',
-				'eyebrow' => $eyebrow,
-				'title'   => __( 'The latest Strava activities could not be loaded just now.', 'awhitepen' ),
-				'meta'    => __( 'Please try again shortly.', 'awhitepen' ),
-			)
-		);
+	if ( ! is_array( $body ) || empty( $body['data'] ) || ! is_array( $body['data'] ) ) {
+		return $unavailable;
 	}
 
-	$activity_response = awhitepen_strava_api_get_json( '/api/v3/athlete/activities?per_page=5&page=1', $access_token );
-
-	if ( is_wp_error( $activity_response ) || empty( $activity_response['body'] ) || ! is_array( $activity_response['body'] ) ) {
-		return awhitepen_footer_module_state_payload(
-			array(
-				'state'   => 'unavailable',
-				'eyebrow' => $eyebrow,
-				'title'   => __( 'The latest Strava activities could not be loaded just now.', 'awhitepen' ),
-				'meta'    => __( 'Please try again shortly.', 'awhitepen' ),
-			)
-		);
-	}
-
-	$activities         = array_values( array_slice( $activity_response['body'], 0, 5 ) );
-	$footer_activities  = array();
+	$feed              = $body['data'];
+	$activities        = ! empty( $feed['activities'] ) && is_array( $feed['activities'] ) ? array_slice( $feed['activities'], 0, 5 ) : array();
+	$footer_activities = array();
 
 	foreach ( $activities as $activity ) {
-		$footer_activity = awhitepen_build_strava_footer_activity_item( $activity, $access_token );
+		$footer_activity = awhitepen_build_garmin_footer_activity_item( $activity );
 
 		if ( ! empty( $footer_activity ) ) {
 			$footer_activities[] = $footer_activity;
@@ -1772,14 +1494,20 @@ function awhitepen_build_strava_footer_activity_data() {
 
 	return array(
 		'state'       => 'ready',
-		'eyebrow'     => __( 'Strava', 'awhitepen' ),
+		'eyebrow'     => $eyebrow,
 		'activities'  => $footer_activities,
-		'profile_url' => ! empty( $activities[0]['athlete']['id'] ) ? 'https://www.strava.com/athletes/' . absint( $activities[0]['athlete']['id'] ) : '',
+		'profile_url' => ! empty( $feed['profile_url'] ) && is_string( $feed['profile_url'] ) ? $feed['profile_url'] : '',
 	);
 }
 
-function awhitepen_get_footer_strava_activity() {
-	$cache_key       = 'awhitepen_footer_strava_feed_v3';
+/**
+ * The Fitness feed is live in Project B, so the card refreshes every minute: a workout
+ * shows, or goes, within a minute of Project B recording or removing it. When a refresh
+ * fails, the last card that loaded stays up instead of the error.
+ */
+function awhitepen_get_footer_garmin_activity() {
+	$cache_key       = 'awhitepen_footer_garmin_feed';
+	$last_good_key   = 'awhitepen_footer_garmin_feed_last_good';
 	$cached_activity = get_transient( $cache_key );
 
 	if (
@@ -1790,55 +1518,64 @@ function awhitepen_get_footer_strava_activity() {
 		return $cached_activity;
 	}
 
-	$activity  = awhitepen_build_strava_footer_activity_data();
-	$cache_ttl = 'ready' === $activity['state'] ? 15 * MINUTE_IN_SECONDS : 5 * MINUTE_IN_SECONDS;
+	$activity = awhitepen_build_garmin_footer_activity_data();
 
-	set_transient( $cache_key, $activity, $cache_ttl );
+	if ( 'ready' === $activity['state'] ) {
+		update_option( $last_good_key, $activity, false );
+	} elseif ( 'unavailable' === $activity['state'] ) {
+		$last_good = get_option( $last_good_key );
+
+		if ( is_array( $last_good ) && ! empty( $last_good['activities'] ) ) {
+			$activity = $last_good;
+		}
+	}
+
+	set_transient( $cache_key, $activity, MINUTE_IN_SECONDS );
 
 	return $activity;
 }
 
-function awhitepen_render_footer_strava_module() {
-	$strava_activity = awhitepen_get_footer_strava_activity();
-	$module_classes  = array( 'footer-embed-card__module', 'footer-embed-card__module--strava' );
+function awhitepen_render_footer_garmin_module() {
+	$garmin_activity = awhitepen_get_footer_garmin_activity();
+	$module_classes  = array( 'footer-embed-card__module', 'footer-embed-card__module--garmin' );
 
-	if ( 'ready' !== $strava_activity['state'] ) {
+	if ( 'ready' !== $garmin_activity['state'] ) {
 		$module_classes[] = 'footer-embed-card__module--placeholder';
 	}
 	?>
-	<div class="<?php echo esc_attr( implode( ' ', $module_classes ) ); ?>" data-module="strava-latest-activity">
-		<?php awhitepen_render_footer_module_eyebrow( $strava_activity['eyebrow'], ! empty( $strava_activity['profile_url'] ) ? $strava_activity['profile_url'] : '' ); ?>
+	<div class="<?php echo esc_attr( implode( ' ', $module_classes ) ); ?>" data-module="garmin-latest-activity">
+		<?php awhitepen_render_footer_module_eyebrow( $garmin_activity['eyebrow'], ! empty( $garmin_activity['profile_url'] ) ? $garmin_activity['profile_url'] : '' ); ?>
 
-		<?php if ( 'ready' === $strava_activity['state'] && ! empty( $strava_activity['activities'] ) ) : ?>
-			<div class="footer-strava-list">
-				<?php foreach ( $strava_activity['activities'] as $index => $activity ) : ?>
+		<?php if ( 'ready' === $garmin_activity['state'] && ! empty( $garmin_activity['activities'] ) ) : ?>
+			<div class="footer-garmin-list">
+				<?php foreach ( $garmin_activity['activities'] as $index => $activity ) : ?>
 					<?php
-					$item_classes    = array( 'footer-strava-item' );
+					$item_classes    = array( 'footer-garmin-item' );
 					$activity_label  = sprintf(
 						/* translators: %s: activity title. */
-						__( 'View %s on Strava', 'awhitepen' ),
+						__( 'View %s on Garmin Connect', 'awhitepen' ),
 						$activity['title']
 					);
 					$has_media       = ! empty( $activity['media_url'] );
 					$is_media_right  = 1 === ( $index % 2 );
 
-					$item_classes[] = 'footer-strava-item--with-slot';
+					$item_classes[] = 'footer-garmin-item--with-slot';
 
 					if ( $is_media_right ) {
-						$item_classes[] = 'footer-strava-item--media-right';
+						$item_classes[] = 'footer-garmin-item--media-right';
 					}
 					?>
 						<a class="<?php echo esc_attr( implode( ' ', $item_classes ) ); ?>" href="<?php echo esc_url( $activity['url'] ); ?>" aria-label="<?php echo esc_attr( $activity_label ); ?>" target="_blank" rel="noopener noreferrer">
-						<span class="footer-strava-item__media<?php echo ! $has_media ? ' footer-strava-item__media--empty' : ''; ?>" aria-hidden="true">
+						<span class="footer-garmin-item__media<?php echo ! $has_media ? ' footer-garmin-item__media--empty' : ''; ?>" aria-hidden="true">
 							<?php if ( $has_media ) : ?>
-								<img class="footer-strava-item__image" src="<?php echo esc_url( $activity['media_url'] ); ?>" alt="" loading="lazy" decoding="async">
+								<img class="footer-garmin-item__image" src="<?php echo esc_url( $activity['media_url'] ); ?>" alt="" loading="lazy" decoding="async">
 							<?php endif; ?>
 						</span>
 
-						<span class="footer-strava-item__content">
-							<span class="footer-embed-card__body footer-embed-card__body--compact footer-strava-item__title"><?php echo esc_html( $activity['title'] ); ?></span>
+						<span class="footer-garmin-item__content">
+							<span class="footer-embed-card__body footer-embed-card__body--compact footer-garmin-item__title"><?php echo esc_html( $activity['title'] ); ?></span>
 							<?php if ( ! empty( $activity['detail_items'] ) ) : ?>
-								<span class="footer-embed-card__details footer-strava-item__details">
+								<span class="footer-embed-card__details footer-garmin-item__details">
 									<?php foreach ( $activity['detail_items'] as $detail_index => $detail_item ) : ?>
 										<?php if ( $detail_index > 0 ) : ?>
 											<span aria-hidden="true">&middot;</span>
@@ -1848,17 +1585,17 @@ function awhitepen_render_footer_strava_module() {
 								</span>
 							<?php endif; ?>
 							<?php if ( ! empty( $activity['timestamp'] ) ) : ?>
-								<span class="footer-strava-item__timestamp"><?php echo esc_html( $activity['timestamp'] ); ?></span>
+								<span class="footer-garmin-item__timestamp"><?php echo esc_html( $activity['timestamp'] ); ?></span>
 							<?php endif; ?>
 						</span>
 					</a>
 				<?php endforeach; ?>
 			</div>
-		<?php elseif ( ! empty( $strava_activity['meta'] ) ) : ?>
-			<p class="footer-embed-card__body footer-embed-card__activity-title"><?php echo esc_html( $strava_activity['title'] ); ?></p>
-			<p class="footer-embed-card__meta"><?php echo esc_html( $strava_activity['meta'] ); ?></p>
-		<?php elseif ( ! empty( $strava_activity['title'] ) ) : ?>
-			<p class="footer-embed-card__body footer-embed-card__activity-title"><?php echo esc_html( $strava_activity['title'] ); ?></p>
+		<?php elseif ( ! empty( $garmin_activity['meta'] ) ) : ?>
+			<p class="footer-embed-card__body footer-embed-card__activity-title"><?php echo esc_html( $garmin_activity['title'] ); ?></p>
+			<p class="footer-embed-card__meta"><?php echo esc_html( $garmin_activity['meta'] ); ?></p>
+		<?php elseif ( ! empty( $garmin_activity['title'] ) ) : ?>
+			<p class="footer-embed-card__body footer-embed-card__activity-title"><?php echo esc_html( $garmin_activity['title'] ); ?></p>
 		<?php endif; ?>
 	</div>
 	<?php
