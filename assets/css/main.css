@@ -183,7 +183,7 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
 .footer-embed-card__details span[aria-hidden="true"]{opacity:.58}
 .footer-embed-card__module--mastodon{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;justify-content:stretch;justify-items:stretch;min-height:100%;min-width:0}
 .footer-embed-card__module--instagram{display:grid;grid-template-rows:auto 1fr;align-content:stretch;justify-content:stretch;justify-items:stretch;min-height:100%;min-width:0}
-.footer-embed-card__module--strava{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-height:100%;width:100%}
+.footer-embed-card__module--garmin{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-height:100%;width:100%}
 /* mastodon */
 .footer-mastodon-list{display:flex;flex-direction:column;gap:.75rem;width:100%;min-height:0;contain:size;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:28px;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}
 .footer-mastodon-list::-webkit-scrollbar{display:none}
@@ -199,25 +199,25 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
 .footer-instagram-grid__tile--placeholder::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--ink-fg) 6%,transparent) 0%,color-mix(in srgb,var(--ink-fg) 2.5%,transparent) 100%)}
 .footer-instagram-grid__tile--placeholder::after{content:"";position:absolute;inset:50% auto auto 50%;width:1.1rem;height:1.1rem;border:1px solid color-mix(in srgb,var(--ink-fg) 20%,transparent);border-radius:50%;transform:translate(-50%,-50%);opacity:.38}
 .footer-instagram-grid__image{display:block;width:100%;height:100%;object-fit:cover}
-/* strava */
-.footer-strava-list{display:flex;flex:1;flex-direction:column;gap:.5rem;align-self:stretch;width:100%;margin-top:auto;margin-bottom:auto}
-.footer-strava-item{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;color:var(--ink-fg);text-decoration:none;width:100%;opacity:.92;transition:opacity .22s ease}
-.footer-strava-item+.footer-strava-item{padding-top:.5rem;border-top:1px solid color-mix(in srgb,var(--ink-fg) 10%,transparent)}
-.footer-strava-item:hover{opacity:1}
-.footer-strava-item:hover .footer-strava-item__media{border-color:color-mix(in srgb,var(--ink-fg) 22%,transparent);background:color-mix(in srgb,var(--ink-fg) 4%,transparent)}
-.footer-strava-item--with-slot{grid-template-columns:4.125rem minmax(0,1fr);align-items:start}
-.footer-strava-item--media-right{grid-template-columns:minmax(0,1fr) 4.125rem}
-.footer-strava-item__media{position:relative;display:block;aspect-ratio:1/1;border-radius:var(--r-md);overflow:hidden;background:color-mix(in srgb,var(--ink-fg) 5%,transparent);border:1px solid color-mix(in srgb,var(--ink-fg) 8%,transparent)}
-.footer-strava-item__media::after{content:"";position:absolute;inset:50% auto auto 50%;width:.9rem;height:.9rem;border:1px solid color-mix(in srgb,var(--ink-fg) 32%,transparent);border-radius:50%;transform:translate(-50%,-50%);opacity:.5}
-.footer-strava-item__image{display:block;width:100%;height:100%;object-fit:cover}
-.footer-strava-item__media--empty{background:transparent;border-color:transparent}
-.footer-strava-item--media-right .footer-strava-item__media{order:2}
-.footer-strava-item__content{min-width:0;display:flex;flex-direction:column;gap:.25rem;width:100%}
-.footer-strava-item--media-right .footer-strava-item__content{order:1}
-.footer-strava-item__title,.footer-strava-item__details{margin:0}
-.footer-strava-item__title{font-size:15px;line-height:1.5;text-wrap:balance}
-.footer-strava-item__details{font-size:13px;line-height:1.5;flex-wrap:wrap;white-space:normal;overflow:visible;text-overflow:clip;row-gap:0}
-.footer-strava-item__timestamp{margin:0;color:var(--ink-muted);font-size:13px;line-height:1.5}
+/* garmin */
+.footer-garmin-list{display:flex;flex:1;flex-direction:column;gap:.5rem;align-self:stretch;width:100%;margin-top:auto;margin-bottom:auto}
+.footer-garmin-item{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;color:var(--ink-fg);text-decoration:none;width:100%;opacity:.92;transition:opacity .22s ease}
+.footer-garmin-item+.footer-garmin-item{padding-top:.5rem;border-top:1px solid color-mix(in srgb,var(--ink-fg) 10%,transparent)}
+.footer-garmin-item:hover{opacity:1}
+.footer-garmin-item:hover .footer-garmin-item__media{border-color:color-mix(in srgb,var(--ink-fg) 22%,transparent);background:color-mix(in srgb,var(--ink-fg) 4%,transparent)}
+.footer-garmin-item--with-slot{grid-template-columns:4.125rem minmax(0,1fr);align-items:start}
+.footer-garmin-item--media-right{grid-template-columns:minmax(0,1fr) 4.125rem}
+.footer-garmin-item__media{position:relative;display:block;aspect-ratio:1/1;border-radius:var(--r-md);overflow:hidden;background:color-mix(in srgb,var(--ink-fg) 5%,transparent);border:1px solid color-mix(in srgb,var(--ink-fg) 8%,transparent)}
+.footer-garmin-item__media::after{content:"";position:absolute;inset:50% auto auto 50%;width:.9rem;height:.9rem;border:1px solid color-mix(in srgb,var(--ink-fg) 32%,transparent);border-radius:50%;transform:translate(-50%,-50%);opacity:.5}
+.footer-garmin-item__image{display:block;width:100%;height:100%;object-fit:cover}
+.footer-garmin-item__media--empty{background:transparent;border-color:transparent}
+.footer-garmin-item--media-right .footer-garmin-item__media{order:2}
+.footer-garmin-item__content{min-width:0;display:flex;flex-direction:column;gap:.25rem;width:100%}
+.footer-garmin-item--media-right .footer-garmin-item__content{order:1}
+.footer-garmin-item__title,.footer-garmin-item__details{margin:0}
+.footer-garmin-item__title{font-size:15px;line-height:1.5;text-wrap:balance}
+.footer-garmin-item__details{font-size:13px;line-height:1.5;flex-wrap:wrap;white-space:normal;overflow:visible;text-overflow:clip;row-gap:0}
+.footer-garmin-item__timestamp{margin:0;color:var(--ink-muted);font-size:13px;line-height:1.5}
 /* social rows */
 .site-footer__grid{display:flex;justify-content:center}
 .site-footer__socials{display:flex;flex-direction:column;align-items:center;text-align:center}

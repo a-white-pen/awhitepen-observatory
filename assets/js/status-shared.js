@@ -33,7 +33,7 @@
       ]
     },
     insurance: {
-      label: "Insurance", day: 5, c: "var(--c-red)",
+      label: "Insurance", day: 1, c: "var(--c-red)",
       foot: "Insurance premiums are currently estimated and exclude CPF-paid portions.",
       items: [
         { n: "Headstart", a: 50, type: "Savings", start: "2020-01" },
