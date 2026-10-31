@@ -38,7 +38,8 @@
 .wip__in{padding:clamp(40px,8vw,84px) 24px}
 .whead__k,.wip__k{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
 .wip__h{margin-top:12px;font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,40px);letter-spacing:-.035em;line-height:1}
-.card{background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,28px)}
+.card{min-width:0;background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-lg);padding:clamp(20px,2.4vw,28px)}
+.whead>div{min-width:0}
 .wfoot{margin-top:16px;padding-top:14px;border-top:1px dotted var(--rule);font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
 .wfoot .ac{color:var(--accent)}
 .tcl__k,.fkey,.bread__k,.tcats__k,.rrec__k,.favgl__k,.tpres__ck,.bax,.rdonut__k,.fxk{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -222,6 +223,8 @@ sup.tmk{margin-left:3px}
 .tact__r--un{border-top:1px dotted var(--rule);margin-top:5px;padding-top:7px;color:var(--muted)}
 .tact__r--un b{color:var(--muted);font-weight:500}
 .tact__f{margin-top:9px;display:grid;gap:3px;font-size:12px;color:var(--muted);line-height:1.45}
+@media(max-width:480px){.tact__hd,.tact__r{grid-template-columns:minmax(0,1fr) 60px 58px;gap:8px}
+.tact__r>span:first-child{overflow-wrap:anywhere}}
 .tsum{margin-top:12px}
 .tsum__r{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
 .tsum__r+.tsum__r{margin-top:6px}
@@ -379,6 +382,10 @@ sup.tmk{margin-left:3px}
 .flh--lg{display:none}
 .flh--sm{display:inline}
 .flsc span:nth-child(even){display:none}}
+/* Keep the timeline's endpoint labels clear of the duration columns on small phones. */
+@media(max-width:480px){.flr,.flscale{grid-template-columns:48px minmax(0,1fr) 50px 50px}
+.flr .alr__d{font-size:11.5px}
+.flsc span:not(:first-child):not(:last-child){display:none}}
 
 /* meals table: header solid --edge · rows dotted · total solid --edge-strong */
 .mscroll{overflow-x:auto;max-width:100%;scrollbar-width:thin}
