@@ -43,9 +43,21 @@ get_header();
 <div class="grp__label">Building things</div>
 <p class="grp__lead">With more time and headspace, B started building things for herself — combining the technical skills she already had with newer AI and coding tools to automate tasks, work with her own data and make everyday life a little better.</p>
 <div class="cardgrid">
-<a class="pcard" href="https://awhitepen.com" target="_blank" rel="noopener"><span class="pcard__media"><img src="https://media.awhitepen.com/portfolio/myself/awhitepen-com-homepage.webp" alt="awhitepen.com homepage" loading="lazy" decoding="async"></span><span class="pcard__body"><span class="pcard__title">awhitepen.com</span><span class="pcard__desc">B’s little corner of the internet — custom WordPress theme, designed and vibe-coded with Codex.</span></span></a>
-<a class="pcard" href="https://github.com/a-white-pen/project-b" target="_blank" rel="noopener"><span class="pcard__media"><img src="https://media.awhitepen.com/portfolio/myself/project-b-health-check.webp" alt="project-b health-check terminal output and live routing domains" loading="lazy" decoding="async"></span><span class="pcard__body"><span class="pcard__title">project-b</span><span class="pcard__desc">B’s personal data system — tracking life, connecting the data and turning it into useful decisions.</span></span></a>
-<a class="pcard" href="https://github.com/a-white-pen/back-to-office" target="_blank" rel="noopener"><span class="pcard__media"><img src="https://media.awhitepen.com/portfolio/myself/back-to-office-job-feed.webp" alt="back-to-office job feed interface" loading="lazy" decoding="async"></span><span class="pcard__body"><span class="pcard__title">back-to-office</span><span class="pcard__desc">B’s job-search system — collecting, deduplicating, filtering and ranking roles from end to end.</span></span></a>
+<article class="pcard pcard--project">
+<a class="pcard__media" href="https://awhitepen.com" target="_blank" rel="noopener"><img src="https://media.awhitepen.com/portfolio/myself/awhitepen-com-homepage.webp" alt="awhitepen.com homepage" loading="lazy" decoding="async"></a>
+<div class="pcard__body"><h3 class="pcard__title">awhitepen.com</h3><p class="pcard__desc">B’s little corner of the internet — custom WordPress theme, designed and vibe-coded with Codex.</p><div class="pcard__foot"><a class="pcard__link" href="https://github.com/a-white-pen/awhitepen-observatory" target="_blank" rel="noopener">View on GitHub ↗</a></div></div>
+</article>
+<article class="pcard pcard--project pcard--video">
+<a class="pcard__media pcard__video" href="https://media.awhitepen.com/portfolio/project-b/project-b.mp4" target="_blank" rel="noopener" aria-label="<?php esc_attr_e( 'Watch the Project B demo (opens in a new tab)', 'awhitepen' ); ?>">
+<img src="<?php echo esc_url( AWHITEPEN_URI . '/assets/img/project-b-video-poster.jpg' ); ?>" width="960" height="540" alt="Project B video: See what’s working — and what could be better, with a weekly check-in on a phone" loading="lazy" decoding="async">
+<span class="pcard__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M8 5v14l11-7z"/></svg>Watch Demo · 2 min</span>
+</a>
+<div class="pcard__body"><h3 class="pcard__title">project-b</h3><p class="pcard__desc">B’s personal data system — tracking life, connecting the data and turning it into useful decisions.</p><div class="pcard__foot"><a class="pcard__link" href="https://github.com/a-white-pen/project-b" target="_blank" rel="noopener">View on GitHub ↗</a></div></div>
+</article>
+<article class="pcard pcard--project">
+<a class="pcard__media" href="https://github.com/a-white-pen/back-to-office" target="_blank" rel="noopener"><img src="https://media.awhitepen.com/portfolio/myself/back-to-office-job-feed.webp" alt="back-to-office job feed interface" loading="lazy" decoding="async"></a>
+<div class="pcard__body"><h3 class="pcard__title">back-to-office</h3><p class="pcard__desc">B’s job-search system — collecting, deduplicating, filtering and ranking roles from end to end.</p><div class="pcard__foot"><a class="pcard__link" href="https://github.com/a-white-pen/back-to-office" target="_blank" rel="noopener">View on GitHub ↗</a></div></div>
+</article>
 </div>
 </div>
 <div class="grp">

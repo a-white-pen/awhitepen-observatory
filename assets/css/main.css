@@ -521,6 +521,11 @@ body.page{padding:0}
 a.pcard:hover{border-color:var(--accent);box-shadow:var(--shadow-hover)}
 .pcard__media{position:relative;display:block;aspect-ratio:16/9;background:var(--edge);overflow:hidden}
 .pcard__media img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard--project:hover{border-color:var(--accent);box-shadow:var(--shadow-hover)}
+.pcard--project .pcard__media:focus-visible{outline-offset:-3px}
+.pcard__play{position:absolute;right:10px;bottom:10px;display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border:1px solid var(--ink-line);border-radius:var(--r-pill);background:var(--ink);color:var(--ink-fg);font-family:var(--body);font-size:11px;font-weight:600;line-height:1.4}
+.pcard__play svg{flex-shrink:0}
+.pcard--project .pcard__link:hover{text-decoration:underline;text-underline-offset:3px}
 /* Media state for a card whose screenshot is not ready. Hatched, so an empty
    slot reads as deliberate rather than as a failed image. */
 .pcard__ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:14px;text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#a49b87;background:repeating-linear-gradient(45deg,#EDE8DC,#EDE8DC 7px,#F3EFE5 7px,#F3EFE5 14px)}
