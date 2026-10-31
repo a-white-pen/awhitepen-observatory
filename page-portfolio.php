@@ -97,7 +97,7 @@ get_header();
 </div>
 <div class="chap"><div class="chap__title">Twitter &amp; Standard Chartered <span class="chap__at">— building for businesses</span></div>
 <div class="prose">
-<p>B's first stint in big corporate came after a decade in television: user and product research, first at Twitter, then at Standard Chartered.</p>
+<p>B's first stint in big corporate came after many years in television: user and product research, first at Twitter, then at Standard Chartered.</p>
 <p>She quickly learnt that doing analytics in a large organisation isn't just about knowing what to do with data. First, you have to find it. Who owns it? Where does it live? Who can give you access? And who knows the unofficial route when the official one leads nowhere?</p>
 <p>The work taught her as much about stakeholder management as analysis — talking to people across teams, building relationships, navigating large organisations, and eventually getting the data and context needed to answer the question.</p>
 </div><div class="refs" data-refs="corporate"></div></div>
