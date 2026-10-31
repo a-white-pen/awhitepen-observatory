@@ -181,12 +181,15 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
 .footer-embed-card__body--compact{font-size:16px}
 .footer-embed-card__details{display:flex;flex-wrap:nowrap;gap:.25rem;align-items:center;color:var(--ink-muted);font-size:14px;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .footer-embed-card__details span[aria-hidden="true"]{opacity:.58}
-.footer-embed-card__module--mastodon{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;justify-content:stretch;justify-items:stretch;min-height:100%;min-width:0}
+.footer-embed-card__module--mastodon,.footer-embed-card__module--garmin{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;justify-content:stretch;justify-items:stretch;min-height:100%;min-width:0}
 .footer-embed-card__module--instagram{display:grid;grid-template-rows:auto 1fr;align-content:stretch;justify-content:stretch;justify-items:stretch;min-height:100%;min-width:0}
-.footer-embed-card__module--garmin{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;min-height:100%;width:100%}
+/* Both feeds keep their profile link fixed above the scrolling list. */
+.footer-mastodon-list,.footer-garmin-list{display:flex;flex-direction:column;width:100%;min-height:0;contain:size;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:28px;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}
+.footer-mastodon-list::-webkit-scrollbar,.footer-garmin-list::-webkit-scrollbar{display:none}
+.footer-garmin-list:focus-visible{outline:2px solid var(--accent-ink);outline-offset:4px}
+.footer-garmin-item{flex-shrink:0}
 /* mastodon */
-.footer-mastodon-list{display:flex;flex-direction:column;gap:.75rem;width:100%;min-height:0;contain:size;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding-bottom:28px;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 28px),transparent)}
-.footer-mastodon-list::-webkit-scrollbar{display:none}
+.footer-mastodon-list{gap:.75rem}
 .footer-mastodon-item+.footer-mastodon-item{padding-top:.75rem;border-top:1px solid color-mix(in srgb,var(--ink-fg) 10%,transparent)}
 .footer-mastodon-item__excerpt,.footer-mastodon-item__meta{margin:0}
 .footer-mastodon-item__excerpt{font-size:15px;line-height:1.5}
@@ -200,7 +203,7 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
 .footer-instagram-grid__tile--placeholder::after{content:"";position:absolute;inset:50% auto auto 50%;width:1.1rem;height:1.1rem;border:1px solid color-mix(in srgb,var(--ink-fg) 20%,transparent);border-radius:50%;transform:translate(-50%,-50%);opacity:.38}
 .footer-instagram-grid__image{display:block;width:100%;height:100%;object-fit:cover}
 /* garmin */
-.footer-garmin-list{display:flex;flex:1;flex-direction:column;gap:.5rem;align-self:stretch;width:100%;margin-top:auto;margin-bottom:auto}
+.footer-garmin-list{gap:.5rem}
 .footer-garmin-item{display:grid;grid-template-columns:minmax(0,1fr);gap:.5rem;color:var(--ink-fg);text-decoration:none;width:100%;opacity:.92;transition:opacity .22s ease}
 .footer-garmin-item+.footer-garmin-item{padding-top:.5rem;border-top:1px solid color-mix(in srgb,var(--ink-fg) 10%,transparent)}
 .footer-garmin-item:hover{opacity:1}
@@ -248,6 +251,7 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
   .site-footer__embed-grid{grid-template-columns:1fr 1fr}
   .footer-embed-card:nth-child(3){grid-column:1 / -1}
   .footer-embed-card__frame{min-height:0}
+  .footer-garmin-list{contain:none;height:20rem}
   /* header collapses here — matches theme main.css @media (max-width:860px) */
   .nav-toggle{display:inline-flex;order:3}
   .site-header__utility{order:2;margin-left:auto;gap:8px}
@@ -286,7 +290,7 @@ body::after{content:"";position:fixed;right:0;bottom:0;width:60vw;height:60vh;po
   .site-footer__embed-grid{grid-template-columns:1fr;gap:1.25rem}
   .footer-embed-card:nth-child(3){grid-column:auto}
   .footer-embed-card__frame{min-height:0}
-  .footer-mastodon-list{contain:none;height:20rem}
+  .footer-mastodon-list,.footer-garmin-list{contain:none;height:20rem}
   .footer-link-row li{padding-right:14px;margin-right:14px}
 }
 

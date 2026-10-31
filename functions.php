@@ -1474,7 +1474,8 @@ function awhitepen_build_garmin_footer_activity_data() {
 	}
 
 	$feed              = $body['data'];
-	$activities        = ! empty( $feed['activities'] ) && is_array( $feed['activities'] ) ? array_slice( $feed['activities'], 0, 5 ) : array();
+	// Project B supplies this calendar year's activities, newest first. Keep the full feed for scrolling.
+	$activities        = ! empty( $feed['activities'] ) && is_array( $feed['activities'] ) ? $feed['activities'] : array();
 	$footer_activities = array();
 
 	foreach ( $activities as $activity ) {
@@ -1490,7 +1491,7 @@ function awhitepen_build_garmin_footer_activity_data() {
 			array(
 				'state'   => 'empty',
 				'eyebrow' => $eyebrow,
-				'title'   => __( 'No recent activities are available yet.', 'awhitepen' ),
+				'title'   => __( 'No activities are available for this year yet.', 'awhitepen' ),
 				'meta'    => __( 'Fresh activity data will appear here automatically.', 'awhitepen' ),
 			)
 		);
@@ -1551,13 +1552,13 @@ function awhitepen_render_footer_garmin_module() {
 		<?php awhitepen_render_footer_module_eyebrow( $garmin_activity['eyebrow'], ! empty( $garmin_activity['profile_url'] ) ? $garmin_activity['profile_url'] : '' ); ?>
 
 		<?php if ( 'ready' === $garmin_activity['state'] && ! empty( $garmin_activity['activities'] ) ) : ?>
-			<div class="footer-garmin-list">
+			<div class="footer-garmin-list" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Garmin activities', 'awhitepen' ); ?>">
 				<?php foreach ( $garmin_activity['activities'] as $index => $activity ) : ?>
 					<?php
 					$item_classes    = array( 'footer-garmin-item' );
 					$activity_label  = sprintf(
 						/* translators: %s: activity title. */
-						__( 'View %s on Garmin Connect', 'awhitepen' ),
+						__( 'View activity: %s', 'awhitepen' ),
 						$activity['title']
 					);
 					$has_media       = ! empty( $activity['media_url'] );
