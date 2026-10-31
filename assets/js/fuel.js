@@ -487,7 +487,7 @@
     return card(
       whead("FOOD LOG") +
       pan("log", state.log, live.n - 1, wdp(d.date)) +
-      '<div class="mscroll"><table class="mtable"><thead><tr><th class="l">Meal</th><th class="l">Items</th>' + head + "</tr></thead>" +
+      '<div class="mscroll"><table class="mtable"><thead><tr><th class="l">Meal</th><th class="l items">Items</th>' + head + "</tr></thead>" +
       "<tbody>" + body + "</tbody>" +
       '<tfoot><tr><td class="tot">Day total</td><td class="items"></td>' + foot + "</tr></tfoot></table></div>"
     );
@@ -784,15 +784,23 @@
     }
 
     var scroll = pane.querySelector("[data-scroll]");
-    var w = Math.max(280, Math.round(scroll.getBoundingClientRect().width));
+    var w = Math.round(scroll.getBoundingClientRect().width);
+
+    if (w <= 0) {
+      return;
+    }
 
     scroll.innerHTML = barsSVG(w, +pane.getAttribute("data-h"));
   }
 
   function render() {
+    var metrics = panel.querySelector(".brng--scroll");
+    var metricScroll = metrics ? metrics.scrollLeft : 0;
+
     panel.innerHTML = byDay() + log() + rhythm() + panelFoot();
     drawPlot();
     window.awhitepenShared.markOverflow(panel);
+    panel.querySelector(".brng--scroll").scrollLeft = metricScroll;
   }
 
   /* ---------- load ---------- */
@@ -806,7 +814,16 @@
   }
 
   function load() {
-    if (rendered || loading) {
+    if (rendered) {
+      // Tab switching makes the panel visible after this click handler runs.
+      window.requestAnimationFrame(function () {
+        drawPlot();
+        shared.markOverflow(panel);
+      });
+      return;
+    }
+
+    if (loading) {
       return;
     }
 
@@ -886,6 +903,10 @@
 
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
+      if (panel.hidden) {
+        return;
+      }
+
       drawPlot();
       window.awhitepenShared.markOverflow(panel);
     }, 150);

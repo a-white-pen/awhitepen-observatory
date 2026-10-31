@@ -616,6 +616,11 @@
   /* ---------- render ---------- */
 
   function render() {
+    var scrollSelectors = [".rscope .brng--wrap", ".brng--scroll"];
+    var scrollPositions = scrollSelectors.map(function (selector) {
+      var row = panel.querySelector(selector);
+      return row ? row.scrollLeft : 0;
+    });
     var mh = live.months[st.m];
     var ms = live.months[st.sm];
 
@@ -625,6 +630,13 @@
       history() + notes() + panelFoot();
 
     window.awhitepenShared.markOverflow(panel);
+    scrollSelectors.forEach(function (selector, i) {
+      var row = panel.querySelector(selector);
+
+      if (row) {
+        row.scrollLeft = scrollPositions[i];
+      }
+    });
   }
 
   var xfadeTimer;
@@ -632,13 +644,16 @@
   window.addEventListener("resize", function () {
     clearTimeout(xfadeTimer);
     xfadeTimer = setTimeout(function () {
-      window.awhitepenShared.markOverflow(panel);
+      if (!panel.hidden) {
+        window.awhitepenShared.markOverflow(panel);
+      }
     }, 150);
   });
 
   /* ---------- load ---------- */
 
   function showFailure(kind) {
+    requested = false;
 
     if (shared) {
       shared.clearSkeleton(panel);
@@ -648,6 +663,9 @@
 
   function load() {
     if (requested) {
+      window.requestAnimationFrame(function () {
+        shared.markOverflow(panel);
+      });
       return;
     }
 

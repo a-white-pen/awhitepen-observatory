@@ -291,6 +291,8 @@
     }
 
     var step = data.length <= 7 ? 1 : data.length <= 30 ? 5 : data.length <= 93 ? 14 : 30;
+    // Date labels need room even when a month of points fits into a phone-width chart.
+    step = Math.max(step, Math.ceil(44 / ppd));
     var lastI = data.length - 1;
     var drawn = [];
 
@@ -300,7 +302,7 @@
       }
     });
 
-    if (lastI - drawn[drawn.length - 1] < 40 / ppd) {
+    if (lastI - drawn[drawn.length - 1] < 44 / ppd) {
       drawn.pop();
     }
 
@@ -614,7 +616,11 @@
     }
 
     var scroll = pane.querySelector("[data-scroll]");
-    var width = Math.max(260, Math.round(scroll.getBoundingClientRect().width));
+    var width = Math.round(scroll.getBoundingClientRect().width);
+
+    if (width <= 0) {
+      return;
+    }
 
     scroll.innerHTML = chart(width, 240, weightOffset);
 

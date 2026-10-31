@@ -247,6 +247,26 @@ document.addEventListener("DOMContentLoaded", function () {
         panel.hidden = panel.getAttribute("data-panel") !== current;
       });
 
+      // Deep links and browser history should also reveal the selected mobile tab.
+      var selectedTab = statusTabs.filter(function (tab) {
+        return tab.getAttribute("data-tab") === current;
+      })[0];
+      var tabList = selectedTab.parentElement;
+
+      if (tabList.scrollWidth > tabList.clientWidth) {
+        var tabBounds = selectedTab.getBoundingClientRect();
+        var listBounds = tabList.getBoundingClientRect();
+        var listStyle = window.getComputedStyle(tabList);
+        var leftEdge = listBounds.left + parseFloat(listStyle.paddingLeft);
+        var rightEdge = listBounds.right - parseFloat(listStyle.paddingRight);
+
+        if (tabBounds.left < leftEdge) {
+          tabList.scrollLeft += tabBounds.left - leftEdge;
+        } else if (tabBounds.right > rightEdge) {
+          tabList.scrollLeft += tabBounds.right - rightEdge;
+        }
+      }
+
       if (updateHash && window.location.hash !== "#" + current) {
         window.history.pushState(null, "", "#" + current);
       }
